@@ -42,6 +42,14 @@ CREATE TABLE airport (
      */
 );
 
+CREATE TABLE airport_gate(
+	airport_code char(3) NOT NULL,
+	gate char (20),
+	PRIMARY (airport_code),
+	CONSTRAINT airport_gate_airport_code_fkey FOREIGN KEY (airport_code) REFERENCES airport(airport_code)
+)
+
+
 CREATE TABLE flights (
     flight_id integer NOT NULL,
     flight_no character(6) NOT NULL,
@@ -91,17 +99,35 @@ CREATE TABLE ticket(
     book_ref character(6) NOT NULL,
     passenger_id varchar(20) NOT NULL,
     passenger_name text,
-    email char(50),
-    phone char(15),
+    email char(30),
+    phone char(10),
+	group_id char(6),
     PRIMARY KEY (ticket_no),
     CONSTRAINT "tickets_book_ref_fkey" FOREIGN KEY (book_ref) REFERENCES bookings(book_ref)
 );
 
-CREATE TABLE ticket_flights (
+CREATE TABLE reservation_booking(
+	book_ref character(6) NOT NULL,
+	reservation_no char(10) NOT NULL,
+	PRIMARY KEY (book_ref),
+	CONSTRAINT "reservation_book_ref_fkey" FOREIGN KEY (book_ref) REFERENCES bookings(book_ref)
+)
+
+CREATE TABLE payment(
+	reservation_no char(10) NOT NULL,
+	card_number char(16) NOT NULL,
+	taxes umeric(10, 2) NOT NULL,
+	amount numeric(10, 2) NOT NULL,
+	PRIMARY KEY (reservation_no),
+	CONSTRAINT "payment_reservation_no_fkey" FOREIGN KEY (reservation_no) REFERENCES reservation_booking(reservation_no)
+)
+
+CREATE TABLE boarding_passes (
     ticket_no character(13) NOT NULL,
     flight_id integer NOT NULL,
+	boarding_no integer NOT NULL,
+	seat_no character varying(4) NOT NULL,
     fare_conditions character varying(10) NOT NULL,
-    amount numeric(10, 2) NOT NULL,
     PRIMARY KEY (ticket_no, flight_id),
     CONSTRAINT ticket_flights_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id),
     CONSTRAINT ticket_flights_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES ticket(ticket_no),
@@ -113,15 +139,6 @@ CREATE TABLE ticket_flights (
             )
         )
     )
-);
-
-CREATE TABLE boarding_passes (
-    ticket_no character(13) NOT NULL,
-    flight_id integer NOT NULL,
-    boarding_no integer NOT NULL,
-    seat_no character varying(4) NOT NULL,
-    PRIMARY KEY(ticket_no, flight_id),
-    CONSTRAINT boarding_passes_ticket_no_fkey FOREIGN KEY (ticket_no, flight_id) REFERENCES ticket_flights(ticket_no, flight_id)
 );
 
 CREATE TABLE seats (
@@ -139,63 +156,43 @@ CREATE TABLE seats (
     )
 );
 
-CREATE TABLE customer (
-    customer_id character NOT NULL,
-    customer_name char(40),
-    phone char(11),
-    boarding_id char(20),
-    type_of_travel text,
-    PRIMARY KEY (customer_id)
-	CONSTRAINT customer_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES boarding_and_ticket(boarding_id)
-	
-);
-
-CREATE TABLE boarding_and_ticket(
-	ticket_no character(13) NOT NULL,
-	boarding_id character(13) NOT NULL,
-	PRIMARY KEY(ticket_no)
-	CONSTRAINT boarding_and_ticket_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES ticket_flights(ticket_no)
-)
-
-CREATE TABLE payment(
-	customer_id character NOT NULL,
-	customer_name char(40),
-	card_number char(40),
-	tax char(3),
-	discound char(3),
-	amount boarding_id char(40),
-	CONSTRAINT customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
-);
 
 CREATE TABLE boarding(
-	boarding_id char(40),
-	flight_id integer NOT NULL,
-	scheduled_departure timestamp WITH time zone NOT NULL,
-	boarding_time timestamp WITH time zone NOT NULL,
-	gate char(10),
-	waitlist char(10),
-	checked_bag char(10),
-	CONSTRAINT flights_check CHECK ((scheduled_departure > boarding_time)),
-	CONSTRAINT flights_departure_airport_fkey FOREIGN KEY (departure_airport) REFERENCES airport(airport_code),
-	CONSTRAINT boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES customer(boarding_id)
+	boarding_no character(13) NOT NULL,
+	boarding_time character timestamp WITH time zone NOT NULL,
+	gate character(13) NOT NULL,
+	wait_list character(13) NOT NULL,
+	checked_bags character(13) NOT NULL,
+	PRIMARY KEY(boarding_no),
+	CONSTRAINT boarding_no_boarding_fkey FOREIGN KEY (boarding_no) REFERENCES boarding_passes(boarding_no)
+)
+
+
+CREATE TABLE fare_price(
+	fare_conditions character varying(10) NOT NULL,
+	price numeric(10, 2) NOT NULL,
+	PRIMARY KEY(fare_conditions),
+	CONSTRAINT fare_price_fare_condition_fkey FOREIGN KEY (fare_conditions) REFERENCES boarding_passes(fare_conditions)
 );
  /*
      need to fix arrival because it use 3 diffents table
      */
 CREATE TABLE arival(
-	ticket_no character(13) NOT NULL,
+	flight_no character(13) NOT NULL,
 	scheduled_arrival timestamp WITH time zone NOT NULL,
 	arrival_gate char(30),
 	baggage_number char(30),
-	CONSTRAINT ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES boarding_and_ticket(ticket_no),
-	CONSTRAINT scheduled_arrival_no_fkey FOREIGN KEY (scheduled_arrival) REFERENCES flights(scheduled_arrival)
+	PRIMARY KEY (flight_no),
+	CONSTRAINT arival_ticket_no_fkey FOREIGN KEY (flight_no) REFERENCES boarding_and_ticket(flight_no),
+	CONSTRAINT arival_scheduled_arrival_no_fkey FOREIGN KEY (scheduled_arrival) REFERENCES flights(scheduled_arrival)
 );
 
 CREATE TABLE flight_info(
 	ticket_no character(13) NOT NULL,
 	movie text,
 	meal text,
-	CONSTRAINT "ticket_no_fkey" FOREIGN KEY (ticket_no) REFERENCES ticket(ticket_no)
+	PRIMARY KEY (ticket_no,
+	CONSTRAINT "flight_info_ticket_no_fkey" FOREIGN KEY (ticket_no) REFERENCES ticket(ticket_no)
 );
 
 /* INSERT VALUES */
