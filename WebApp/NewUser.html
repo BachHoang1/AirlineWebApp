@@ -23,18 +23,19 @@
 
     <body>
         <h1>Airline Web Application</h1><br>
+        <h3>Enter your Information</h3>
         <form id="UserInfo" onclick="javascript:getInfo()">
-            <label for="fname">First name:   </label>
+            <label for="fname"> Name: </label>
             <input type="text" id="fname" name="fname"><br><br>
-
-            <label for="lname">Last name:    </label>
-            <input type="text" id="lname" name="lname"><br><br>
 
             <label for="phone">Phone Number:</label>
             <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"><br><br>
 
             <label for="email">Email:</label>
             <input type="email" id="email" name="email"><br><br>
+
+            <label for="CardNumber">Credit Card:</label>
+            <input type="number" id="CardNumber"><br><br>
 
             <input type="submit" name="submit">
         </form>
