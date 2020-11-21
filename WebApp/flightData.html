@@ -16,7 +16,10 @@
                 color: white;
                 padding: 10px 10px 10px 10px;
             }
-
+            tr.selected td {
+                background-color: #333;
+                color: #fff;    
+            }
         </style>
     </head>
 
@@ -24,8 +27,7 @@
         <h1>Airline Web Application</h1><br>
         <h3>Search Results</h3>
         <div id="table"></div>
-        <script defer type="text/javascript" src="AirlineWebApp.js">
-
-        </script>
+        <input type="button" id="confirmFlight" value="Confirm Flight">
+        <script defer type="text/javascript" src="AirlineWebApp.js"></script>
     </body>
 </html>
