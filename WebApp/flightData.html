@@ -11,14 +11,40 @@
 
             form{
                 background-color:black;
-                background-size: 100px 100px;
-                background-position-x: center;
+                width: 450px;
                 color: white;
                 padding: 10px 10px 10px 10px;
+                margin: 0 auto;
+            }
+            h1,h3{
+                text-align: center;
             }
             tr.selected td {
                 background-color: #333;
                 color: #fff;    
+            }
+            table, th{
+                border: 3px solid black;
+                border-collapse: collapse;
+                margin: auto;
+                text-align: center;
+                width: 1000px;
+                font-size: 20px;
+            }
+            tr{
+                border-bottom: 3px solid black;
+            }
+            input{
+                margin: auto;
+                position: center;
+                text-align: center;
+            }
+            #button{
+                text-align: center;
+                padding: 20px;
+            }
+            input{
+                font-size: 15px;
             }
         </style>
     </head>
@@ -27,7 +53,9 @@
         <h1>Airline Web Application</h1><br>
         <h3>Search Results</h3>
         <div id="table"></div>
-        <input type="button" id="confirmFlight" value="Confirm Flight">
+        <div id="button">
+            <input type="button" id="confirmFlight" value="Confirm Flight">
+        </div>
         <script defer type="text/javascript" src="AirlineWebApp.js"></script>
     </body>
 </html>
