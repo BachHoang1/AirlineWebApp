@@ -6,6 +6,7 @@
         <style type="text/css">
             body{
                 background: #999;
+                background-image: url("https://wallpapercave.com/wp/wp2025512.jpg");
                 font-family: Arial;
             }
 
@@ -28,7 +29,7 @@
                 height: 100%;
                 position: absolute;
                 top: 0;
-                display: flex;
+                display: none;
                 justify-content: center;
                 align-items: center;
             }
@@ -36,7 +37,7 @@
             .modal-contents {
                 height: 300px;
                 width: 500px;
-                background-color: white;
+                background-color: gray;
                 text-align: center;
                 padding: 20px;
                 position: relative;
@@ -78,6 +79,7 @@
             <div class="modal-contents">      
                 <div class="close">+</div>
                 <p id="output"></p>
+                <input type="button" id="confirmFlight" value="Confirm">
             </div>
         </div>
         <script defer type="text/javascript" src="AirlineWebApp.js"></script>

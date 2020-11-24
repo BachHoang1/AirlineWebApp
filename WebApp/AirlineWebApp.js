@@ -31,23 +31,30 @@ async function connectToDatabase()
 }
 
 function getInfo()
-{
-    document.getElementById('button').addEventListener("click", function() {
-        document.querySelector('.bg-modal').style.display = "flex";
-    });    
-    document.querySelector('.close').addEventListener("click", function() {
-        document.querySelector('.bg-modal').style.display = "none";
-    });
+{  
     form = document.getElementById("UserInfo");
     form.addEventListener("submit", function(e){
         e.preventDefault();
         document.querySelector('.bg-modal').style.display = "flex";
         for( var i = 0; i < form.elements.length-1; i++)
-        {
-        sessionStorage.setItem(userKey[i], form.elements[i].value);
-        }
-        //console.log(sessionStorage.getItem("Departing City"));
-        //window.location.href = 'AirlineWebApp.html';
+            sessionStorage.setItem(userKey[i], form.elements[i].value);
+
+        var text = "Flight Information<br><br>";
+        for(var i = 0; i < tableKey.length; i++)
+            text += sessionStorage.getItem(tableKey[i]) + " ";
+            
+        text += "<br><br>User information<br><br>";
+        for(var i = 0; i < userKey.length; i++)
+            text += sessionStorage.getItem(userKey[i]) + " ";
+
+        text += "<br><br>Is this information correct?<br>";
+        document.getElementById("output").innerHTML = text;
+    });
+
+    button = document.getElementById("confirmFlight");
+    button.addEventListener('click', function(e){
+        e.preventDefault();
+        //window.location.href = 'NewUser.html';
     });
 }
 
