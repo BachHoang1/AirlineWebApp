@@ -11,17 +11,33 @@
             }
 
             form{
-                background-color:black;
+                background-color:grey;
+                border: 3px solid black;
                 width: 200px;
                 color: white;
                 padding: 10px 10px 10px 10px;
                 margin: 0 auto;
             }
             label{
+                color: black;
                 display: block;
             }
-            h1,h3{
+            input{
+                border: 2px solid black;
+            }
+            h1{
+                width: 360px;
                 text-align: center;
+                background-color: gray;
+                border: 2px solid black;
+                margin: 0 auto;
+            }
+            h3{
+                width: 210px;
+                text-align: center;
+                background-color: gray;
+                border: 2px solid black;
+                margin: 0 auto;
             }
             .bg-modal {
                 background-color: rgba(0, 0, 0, 0.8);
@@ -54,12 +70,26 @@
                 transform: rotate(45deg);
                 cursor: pointer;
             }
+            #FlightData{
+                background-color: white;
+                display: inline-block;
+                text-align: left;
+                margin-right: 10px;
+                margin-left: 10px;
+                border: 2px solid black;
+            }
+            #UserData{
+                background-color: white;
+                display: inline-block;
+                text-align: left;
+                border: 2px solid black;             
+            }
         </style>
     </head>
 
     <body>
         <h1>Airline Web Application</h1><br>
-        <h3>Enter your Information</h3>
+        <h3>Enter your Information</h3><br>
         <form id="UserInfo" onclick="javascript:getInfo()">
             <label for="fname"> Name: </label>
             <input type="text" id="fname" name="fname"><br><br>
@@ -77,9 +107,11 @@
         </form>
         <div class="bg-modal">
             <div class="modal-contents">      
-                <div class="close">+</div>
+                <div id="FlightData"></div>
+                <div id="UserData"></div><br>
                 <p id="output"></p>
-                <input type="button" id="confirmFlight" value="Confirm">
+                <input type="button" id="confirmFlight" value="Confirm Flight">
+                <input type="button" id="Cancel" value="Cancel">
             </div>
         </div>
         <script defer type="text/javascript" src="AirlineWebApp.js"></script>

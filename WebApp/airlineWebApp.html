@@ -12,20 +12,38 @@
 
             form{
                 background-color: gray;
+                border: 3px solid black;
                 width: 450px;
                 color: white;
                 padding: 10px 10px 10px 10px;
                 margin: 0 auto;
             }
-            h1,h3{
+            label{
+                color: black;
+            }
+            input{
+                border: 2px solid black;
+            }
+            h1{
+                width: 360px;
                 text-align: center;
+                background-color: gray;
+                border: 2px solid black;
+                margin: 0 auto;
+            }
+            h3{
+                width: 170px;
+                text-align: center;
+                background-color: gray;
+                border: 2px solid black;
+                margin: 0 auto;
             }
         </style>
     </head>
 
     <body>
         <h1>Airline Web Application</h1><br>
-        <h3>Search for a flight</h3>
+        <h3>Search for a flight</h3><br>
         <p>
             <form id="search" onclick="javascript:searchFlights()">
                 <label for="departingCity"> From: </label>

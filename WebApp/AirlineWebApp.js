@@ -2,34 +2,6 @@ var userKey = ["UserName", "UserPhoneNum", "UserEmail", "UserCardNum"];
 var searchKey = ["searchDepartingCity", "searchArrivalCity", "searchStartDate", "SearchendDate", "SearchnumberOfPeople"];
 let tableKey = ['Departing City', 'Arrival City', 'Flight Duration', 'Connecting Flights', 'Fare Condition', 'Price'];
 
-async function connectToDatabase()
-{
-    var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt"
-    const fs = require('fs');
-    const {Client} = require('pg');
-    
-    var data = fs.readFileSync(path, "utf8").split(",");
-
-    const client = new Client({
-        user: data[0],
-        password: data[1],
-        host: "code.cs.uh.edu",
-        database: "COSC3380"
-    })
-
-    try 
-    {
-        await client.connect()
-        const result = await client.query("select * from bookings.aircraft;")
-        client.end()
-        console.log(console.table(result.rows));
-    } 
-    catch (error) 
-    {
-        console.log(error);
-    }
-}
-
 function getInfo()
 {  
     form = document.getElementById("UserInfo");
@@ -39,16 +11,24 @@ function getInfo()
         for( var i = 0; i < form.elements.length-1; i++)
             sessionStorage.setItem(userKey[i], form.elements[i].value);
 
-        var text = "Flight Information<br><br>";
+        var flightText = "Flight Information<br><br>";
         for(var i = 0; i < tableKey.length; i++)
-            text += sessionStorage.getItem(tableKey[i]) + " ";
+            flightText += tableKey[i] + ": " + sessionStorage.getItem(tableKey[i]) + "<br>";
             
-        text += "<br><br>User information<br><br>";
+        var UserText = "User information<br><br>";
         for(var i = 0; i < userKey.length; i++)
-            text += sessionStorage.getItem(userKey[i]) + " ";
+            UserText += userKey[i] + ": " + sessionStorage.getItem(userKey[i]) + "<br>";
 
-        text += "<br><br>Is this information correct?<br>";
+        var text = "<br><br>Is this information correct? By clicking submit, your flight will be booked<br>";
+        document.getElementById("FlightData").innerHTML = flightText;
+        document.getElementById("UserData").innerHTML = UserText;
         document.getElementById("output").innerHTML = text;
+    });
+
+    button = document.getElementById("Cancel");
+    button.addEventListener('click', function(e){
+        e.preventDefault();
+        document.querySelector('.bg-modal').style.display = "none";
     });
 
     button = document.getElementById("confirmFlight");
@@ -67,7 +47,12 @@ function searchFlights()
         {
         sessionStorage.setItem(searchKey[i], form.elements[i].value);
         }
-        window.location.href = 'flightData.html';
+        //window.location.href = 'flightData.html';
+        fs.readFile('airlineWebApp.html', function(err, data) {
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.write(data);
+            return res.end();
+        });
     });
 }
 

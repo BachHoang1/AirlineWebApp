@@ -17,8 +17,19 @@
                 padding: 10px 10px 10px 10px;
                 margin: 0 auto;
             }
-            h1,h3{
+            h1{
+                width: 360px;
                 text-align: center;
+                background-color: gray;
+                border: 2px solid black;
+                margin: 0 auto;
+            }
+            h3{
+                width: 140px;
+                text-align: center;
+                background-color: gray;
+                border: 2px solid black;
+                margin: 0 auto;
             }
             tr.selected td {
                 background-color: #333;
@@ -53,7 +64,7 @@
 
     <body onload="javascript:displayResults()">
         <h1>Airline Web Application</h1><br>
-        <h3>Search Results</h3>
+        <h3>Search Results</h3><br>
         <div id="table"></div>
         <div id="button">
             <input type="button" id="confirmFlight" value="Confirm Flight">
