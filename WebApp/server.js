@@ -1,43 +1,49 @@
-const http = require("http");
-const host = 'localhost';
-const port = 8000;
+const express = require("express");
+const cors = require('cors');
 const fs = require('fs');
-const requestListener = function (req, res) {
-    fs.readFile('airlineWebApp.html', function(err, data) {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write(data);
-        return res.end();
-    });
-};
-const server = http.createServer(requestListener);
+const {Client} = require('pg');
+
+const server = express();
+const port = 8000;
+const host = "localhost";
+
+server.use(cors());
+server.use(express.json());
+server.use(express.static(__dirname));
+
+var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt"
+var data = fs.readFileSync(path, "utf8").split(",");
+
+const client = new Client({
+    user: data[0],
+    password: data[1],
+    host: "code.cs.uh.edu",
+    database: "COSC3380"
+})
+
 server.listen(port, host, () => {
     console.log(`Server is running on http://${host}:${port}`);
 });
 
-async function connectToDatabase()
-{
-    var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt"
-    const fs = require('fs');
-    const Client = require('pg');
-    
-    var data = fs.readFileSync(path, "utf8").split(",");
+server.get('/AirlineWebApp', function(req, res) {
+    res.sendFile(__dirname + '/AirlineWebApp.html');
+});
 
-    const client = new Client({
-        user: data[0],
-        password: data[1],
-        host: "code.cs.uh.edu",
-        database: "COSC3380"
-    })
+server.get('/flightData', function(req, res) {
+    res.sendFile(__dirname + '/flightData.html');
+});
 
-    try 
-    {
+server.post('/searchResults', async(req, res)=>{
+    try{
+  
+        const body = req.body;
+        console.log(body);
         await client.connect()
-        const result = await client.query("select * from bookings.aircraft;")
-        client.end()
-        console.log(console.table(result.rows));
+        const result = await client.query("select * from bookings.aircraft;");
+        client.end();
+        res.json(result.rows);
     } 
-    catch (error) 
-    {
-        console.log(error);
+    catch(err){
+        console.log(err.message);
     }
-}
+  });

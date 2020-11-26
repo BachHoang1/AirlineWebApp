@@ -41,23 +41,31 @@ function getInfo()
 function searchFlights()
 {
     form = document.getElementById("search");
-    form.addEventListener("submit", function(e){
+    form.addEventListener('submit', function(e){
         e.preventDefault();
         for( var i = 0; i < form.elements.length-1; i++)
         {
         sessionStorage.setItem(searchKey[i], form.elements[i].value);
+        console.log(sessionStorage.getItem(searchKey[i]));
         }
-        //window.location.href = 'flightData.html';
-        fs.readFile('airlineWebApp.html', function(err, data) {
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write(data);
-            return res.end();
-        });
+        window.location.href = 'http://localhost:8000/flightData';
     });
 }
 
-function displayResults()
+async function displayResults()
 {
+    const body = [];
+    for( var i = 0; i < searchKey.length; i++)
+        {
+            body[i] = sessionStorage.getItem(searchKey[i]);
+        }
+    const response = await fetch("http://localhost:8000/searchResults", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const jsonData = await response.json();
+    console.log(jsonData);
     var selectedRow = [];
     let flights = [{ Departing_City: 'Houston',
                     Arrival_City:'Tokyo', 
