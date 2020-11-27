@@ -34,7 +34,7 @@ function getInfo()
     button = document.getElementById("confirmFlight");
     button.addEventListener('click', function(e){
         e.preventDefault();
-        //window.location.href = 'NewUser.html';
+        window.location.href = 'http://localhost:8000/bookedFlight';
     });
 }
 
@@ -120,6 +120,36 @@ async function displayResults()
         {
         sessionStorage.setItem(tableKey[i], selectedRow[i]);
         }
-        window.location.href = 'NewUser.html';
+        window.location.href = 'http://localhost:8000/UserInfo';
+    });
+}
+
+async function displayFlight()
+{
+    const body = [];
+    for( var i = 0; i < tableKey.length; i++)
+        body.push(sessionStorage.getItem(tableKey[i]));
+    for( var i = 0; i < userKey.length; i++)
+        body.push(sessionStorage.getItem(userKey[i]));
+
+    const response = await fetch("http://localhost:8000/UserFlight", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+    const jsonData = await response.json();
+    console.log(jsonData);
+    var text = "";
+    for(var i = 0; i < jsonData.length; i++)
+    {
+        console.log(jsonData[i][1]);
+        text += jsonData[i] + "<br>";
+    }
+    document.getElementById("output").innerHTML = text;
+
+    button = document.getElementById("Home");
+    button.addEventListener('click', function(e){
+        e.preventDefault();
+        window.location.href = 'http://localhost:8000/AirlineWebApp';
     });
 }

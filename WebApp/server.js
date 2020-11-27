@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require('cors');
 const fs = require('fs');
-const {Client} = require('pg');
+const {Pool} = require('pg');
 
 const server = express();
 const port = 8000;
@@ -14,7 +14,7 @@ server.use(express.static(__dirname));
 var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt"
 var data = fs.readFileSync(path, "utf8").split(",");
 
-const client = new Client({
+const pool = new Pool({
     user: data[0],
     password: data[1],
     host: "code.cs.uh.edu",
@@ -33,12 +33,36 @@ server.get('/flightData', function(req, res) {
     res.sendFile(__dirname + '/flightData.html');
 });
 
+server.get('/UserInfo', function(req, res) {
+    res.sendFile(__dirname + '/NewUser.html');
+});
+
+server.get('/bookedFlight', function(req, res) {
+    res.sendFile(__dirname + '/confirmedFlight.html');
+});
+
 server.post('/searchResults', async(req, res)=>{
     try{
-  
+        //query database for flights based on search fields
         const body = req.body;
         console.log(body);
-        await client.connect()
+        const client = await pool.connect();
+        const result = await client.query("select * from bookings.aircraft;");
+        client.end();
+        res.json(result.rows);
+    } 
+    catch(err){
+        console.log(err.message);
+    }
+  });
+
+  server.post('/UserFlight', async(req, res)=>{
+    try{
+        //start booking transaction
+        //then if successful, return boarding info
+        const body = req.body;
+        console.log(body);
+        const client = await pool.connect();
         const result = await client.query("select * from bookings.aircraft;");
         client.end();
         res.json(result.rows);
