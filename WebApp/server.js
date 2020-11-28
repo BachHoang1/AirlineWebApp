@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require('cors');
 const fs = require('fs');
 const {Pool} = require('pg');
+const { json } = require("express");
 
 const server = express();
 const port = 8000;
@@ -65,9 +66,9 @@ server.post('/searchResults', async(req, res)=>{
         const client = await pool.connect();
         const result = await client.query("select * from bookings.aircraft;");
         client.end();
-        res.json(result.rows);
+        res.json(result.rows[0]);
     } 
     catch(err){
-        console.log(err.message);
+        res.json(JSON.stringify(err.message));
     }
   });

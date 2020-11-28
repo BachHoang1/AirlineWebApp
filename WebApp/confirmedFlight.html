@@ -9,15 +9,26 @@
                 background-image: url("https://wallpapercave.com/wp/wp2025512.jpg");
                 font-family: Arial;
             }
-
+            table{
+                padding: 10px 10px 10px 10px;
+                border: 3px solid black;
+                border-collapse: collapse;
+                margin: auto;
+                text-align: center;
+                width: 300px;
+            }
+            td{
+                border: 3px solid black;
+            }
             p{
+                text-align: center;
+            }
+            #data{
                 background-color: gray;
                 border: 3px solid black;
                 width: 450px;
-                color: white;
-                padding: 10px 10px 10px 10px;
-                margin: 0 auto;
-                text-align: right;
+                text-align: center;
+                margin: auto;
             }
             input{
                 border: 2px solid black;
@@ -34,10 +45,14 @@
 
     <body onload="javascript:displayFlight()">
         <h1>Airline Web Application</h1><br>
-        <div>          
+
+        <div id="data">
             <p id="output"></p>
+            <div id="flight"></div>
+            <p></p>  
             <input type="button" id="Home" value="Back to Home">
-            <script defer type="text/javascript" src="airlineWebApp.js"></script>
+            <p></p>
         </div>
+        <script defer type="text/javascript" src="airlineWebApp.js"></script>
     </body>
 </html>
