@@ -96,23 +96,11 @@ server.post('/searchResults', async(req, res)=>{
     }
   });
 
-  server.post('/UserFlight', async(req, res)=>{
+    // for airline 
+
+server.post('/booking', async(req, res)=>
+{
     try{
-        //start booking transaction
-        //then if successful, return boarding info
-        const body = req.body;
-        console.log(body);
-        const client = await pool.connect();
-        const result = await client.query("select * from bookings.aircraft;");
-        client.end();
-        res.json(result.rows);
-    } 
-    catch(err){
-        console.log(err.message);
-    }
-      // for airline 
-      server.post('/booking', async(req, res)=>{
-        try{
           let a = 3;
           const b = ++a;
       
@@ -127,10 +115,10 @@ server.post('/searchResults', async(req, res)=>{
         } catch(err){
           console.log(err.message);
         }
-      });
+});
       
       // for airline 
-      server.post('/payment', async(req, res)=>{
+server.post('/payment', async(req, res)=>{
         try{
           let a = 3;
           const b = ++a;
@@ -148,7 +136,7 @@ server.post('/searchResults', async(req, res)=>{
         }
       });
       
-      server.post('/reservation', async(req, res)=>{
+server.post('/reservation', async(req, res)=>{
         try{
           let a = 3;
           const b = ++a;
@@ -166,7 +154,7 @@ server.post('/searchResults', async(req, res)=>{
         }
       });
       
-      server.post('/ticket', async(req, res)=>{
+server.post('/ticket', async(req, res)=>{
         try{
           let a = 3;
           const b = ++a;
@@ -184,7 +172,7 @@ server.post('/searchResults', async(req, res)=>{
         }
       });
       
-      server.post('/payment', async(req, res)=>{
+server.post('/payment', async(req, res)=>{
         try{
           let a = 3;
           const b = ++a;
@@ -202,7 +190,7 @@ server.post('/searchResults', async(req, res)=>{
         }
       });
 
-      server.post('/client_flight', async(req, res)=>{
+server.post('/client_flight', async(req, res)=>{
         try{
           let a = 3;
           const b = ++a;
@@ -220,7 +208,7 @@ server.post('/searchResults', async(req, res)=>{
         }
       });
 
-      server.post('/ticket_boarding', async(req, res)=>{
+server.post('/ticket_boarding', async(req, res)=>{
         try{
           let a = 3;
           const b = ++a;
@@ -238,7 +226,7 @@ server.post('/searchResults', async(req, res)=>{
         }
       });
       
-      server.post('/ticket_flights', async(req, res)=>{
+server.post('/ticket_flights', async(req, res)=>{
         try{
           let a = 3;
           const b = ++a;
@@ -257,7 +245,7 @@ server.post('/searchResults', async(req, res)=>{
       });
 
       //update a todo by id
-      server.put("/todos/:id", async (req, res) => {
+server.put("/todos/:id", async (req, res) => {
         try {
           const { id } = req.params;
           const { description } = req.body;
@@ -269,4 +257,19 @@ server.post('/searchResults', async(req, res)=>{
           console.error(err.message);
         }
       });
-  });
+
+server.post('/UserFlight', async(req, res)=>{
+    try{
+        //start booking transaction
+        //then if successful, return boarding info
+        const body = req.body;
+        console.log(body);
+        const client = await pool.connect();
+        const result = await client.query("select * from bookings.aircraft;");
+        client.end();
+        res.json(result.rows);
+    } 
+    catch(err){
+        console.log(err.message);
+    }
+});
