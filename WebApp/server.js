@@ -42,6 +42,10 @@ server.get('/bookedFlight', function(req, res) {
     res.sendFile(__dirname + '/confirmedFlight.html');
 });
 
+server.get('/showTicket', function(req, res) {
+    res.sendFile(__dirname + '/showTicket.html');
+});
+
 server.post('/searchResults', async(req, res)=>{
     try{
         //query database for flights based on search fields

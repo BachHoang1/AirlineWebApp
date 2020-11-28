@@ -193,3 +193,18 @@ async function displayFlight()
         window.location.href = 'http://localhost:8000/AirlineWebApp';
     });
 }
+
+function checkFlight()
+{
+    var ticketNumber;
+    form = document.getElementById("search");
+    form.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        ticketNumber = form.elements[0].value;
+        //sessionStorage.setItem("searchInfo", JSON.stringify(searchInfo)); 
+        sessionStorage.setItem("ticketNumber", ticketNumber);
+
+        window.location.href = 'http://localhost:8000/showTicket';
+    });
+}
