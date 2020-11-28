@@ -59,7 +59,12 @@ function searchFlights()
 
         for( var i = 0; i < form.elements.length-1; i++)
             searchInfo.push(form.elements[i].value);
-        sessionStorage.setItem("searchInfo", JSON.stringify(searchInfo));
+        console.log(searchInfo);
+        //sessionStorage.setItem("searchInfo", JSON.stringify(searchInfo));
+        for(var i = 0; i < userKey.length; i++)
+        {
+            sessionStorage.setItem(userKey[i], searchInfo[i]);
+        }
 
         window.location.href = 'http://localhost:8000/flightData';
     });
@@ -69,7 +74,13 @@ async function displayResults()
 {
     var selectedRow = [];
     var columnNames = [];
-    var searchInfo = JSON.parse(sessionStorage.getItem("searchInfo"));
+    var searchInfo = [];
+    //var searchInfo = JSON.parse(sessionStorage.getItem("searchInfo"));
+    for(var i = 0; i < userKey.length; i++)
+    {
+        searchInfo.push(sessionStorage.getItem(userKey[i]));
+    }
+
     const body = searchInfo;
     const response = await fetch("http://localhost:8000/searchResults", {
       method: "POST",
