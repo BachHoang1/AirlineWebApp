@@ -46,7 +46,22 @@ server.get('/showTicket', function(req, res) {
     res.sendFile(__dirname + '/showTicket.html');
 });
 
-server.post('/searchResults', async(req, res)=>{
+server.post('/searchDirectResults', async(req, res)=>{
+    try{
+        //query database for flights based on search fields
+        const body = req.body;
+        console.log(body);
+        const client = await pool.connect();
+        const result = await client.query("select * from bookings.aircraft;");
+        client.end();
+        res.json(result.rows);
+    } 
+    catch(err){
+        console.log(err.message);
+    }
+  });
+
+  server.post('/searchIndirectResults', async(req, res)=>{
     try{
         //query database for flights based on search fields
         const body = req.body;
@@ -62,6 +77,22 @@ server.post('/searchResults', async(req, res)=>{
   });
 
   server.post('/UserFlight', async(req, res)=>{
+    try{
+        //start booking transaction
+        //then if successful, return boarding info
+        const body = req.body;
+        console.log(body);
+        const client = await pool.connect();
+        const result = await client.query("select * from bookings.aircraft;");
+        client.end();
+        res.json(result.rows);
+    } 
+    catch(err){
+        res.json(JSON.stringify(err.message));
+    }
+  });
+
+  server.post('/Ticket', async(req, res)=>{
     try{
         //start booking transaction
         //then if successful, return boarding info

@@ -81,8 +81,10 @@ async function displayResults()
         searchInfo.push(sessionStorage.getItem(searchKey[i]));
     }
 
+    //=============================Direct Flight Table==========================
+
     const body = searchInfo;
-    const response = await fetch("http://localhost:8000/searchResults", {
+    const response = await fetch("http://localhost:8000/searchDirectResults", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -121,7 +123,10 @@ async function displayResults()
 
         row.addEventListener('click', function(){
         for(var i = 0; i < table.rows.length; i++)
+        {
             table.rows[i].classList.remove('selected');
+            table2.rows[i].classList.remove('selected');
+        }
         row.classList.add('selected');
         selectedRow = [];
         for(var i = 0; i < row.cells.length; i++)
@@ -130,6 +135,61 @@ async function displayResults()
     });    
     myTable.appendChild(table);
 
+    //=============================Indirect Flight Table==========================
+
+    const response2 = await fetch("http://localhost:8000/searchIndirectResults", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const jsonData2 = await response2.json();
+    console.log(jsonData2);
+
+    columnNames = [];
+    for(var key in jsonData2[0])
+    {
+        var name = key.replace(/_/g,' ');
+        columnNames.push(name);
+    }
+
+    let flights2 = jsonData2;
+    let myTable2 = document.getElementById('table2');
+    let table2 = document.createElement('table');
+    let headerRow2 = document.createElement('tr');
+    columnNames.forEach(headerText2 => {
+        let header2 = document.createElement('th');
+        let textNode2 = document.createTextNode(headerText2);
+        header2.appendChild(textNode2);
+        headerRow2.appendChild(header2);
+        });
+ 
+    table2.appendChild(headerRow2);
+    
+    flights2.forEach(emp => {
+        let row = document.createElement('tr');
+        Object.values(emp).forEach(text => {
+        let cell = document.createElement('td');
+        let textNode = document.createTextNode(text);
+        cell.appendChild(textNode);
+        row.appendChild(cell);
+        })
+        table2.appendChild(row);
+
+        row.addEventListener('click', function(){
+        for(var i = 0; i < table2.rows.length; i++)
+        {
+            table2.rows[i].classList.remove('selected');
+            table.rows[i].classList.remove('selected');
+        }
+        row.classList.add('selected');
+        selectedRow = [];
+        for(var i = 0; i < row.cells.length; i++)
+            selectedRow.push(row.cells[i].innerText);
+        });
+    });    
+    myTable2.appendChild(table2);
+
+    //=============================Confirm Button==========================
     form = document.getElementById("confirmFlight");
     form.addEventListener('click', function(e){
         e.preventDefault();
@@ -168,21 +228,28 @@ async function displayFlight()
     {
         document.getElementById("output").innerHTML = "Booking was successful! Below is the boarding information";
         var div = document.getElementById("flight");
-        table = document.createElement('table');
-        for( const [key, value] of Object.entries(jsonData))
+        for(var i = 0; i < jsonData.length; i++)
         {
-            let row = document.createElement('tr');
-            let cell1 = document.createElement('td');
-            let cell2 = document.createElement('td');
-            let textNode1 = document.createTextNode(key);
-            let textNode2 = document.createTextNode(value);
-            cell1.appendChild(textNode1);
-            cell2.appendChild(textNode2);
-            row.appendChild(cell1);
-            row.appendChild(cell2);
-            table.appendChild(row);
+            table = document.createElement('table');
+            let headerRow = document.createElement('th');
+            let textNode = document.createTextNode("Ticket #" + (i + 1));
+            headerRow.appendChild(textNode);
+            table.appendChild(headerRow);
+            for( const [key, value] of Object.entries(jsonData[i]))
+            {
+                let row = document.createElement('tr');
+                let cell1 = document.createElement('td');
+                let cell2 = document.createElement('td');
+                let textNode1 = document.createTextNode(key);
+                let textNode2 = document.createTextNode(value);
+                cell1.appendChild(textNode1);
+                cell2.appendChild(textNode2);
+                row.appendChild(cell1);
+                row.appendChild(cell2);
+                table.appendChild(row);
+            }
+            div.appendChild(table);
         }
-        div.appendChild(table);
     }
     else
         document.getElementById("output").innerHTML = "Booking was not successful";
@@ -197,14 +264,56 @@ async function displayFlight()
 function checkFlight()
 {
     var ticketNumber;
-    form = document.getElementById("search");
+    form = document.getElementById("checkFlight");
     form.addEventListener('submit', function(e){
         e.preventDefault();
 
         ticketNumber = form.elements[0].value;
-        //sessionStorage.setItem("searchInfo", JSON.stringify(searchInfo)); 
+        console.log(ticketNumber);
         sessionStorage.setItem("ticketNumber", ticketNumber);
 
         window.location.href = 'http://localhost:8000/showTicket';
+    });
+}
+
+async function displayTicket()
+{
+    const body =[];
+    body.push(sessionStorage.getItem("ticketNumber"));
+
+    const response = await fetch("http://localhost:8000/Ticket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+    const jsonData = await response.json();
+    console.log(jsonData);
+
+    document.getElementById("output").innerHTML = "Your ticket information";
+    var div = document.getElementById("flight");
+    table = document.createElement('table');
+    let headerRow = document.createElement('th');
+    let textNode = document.createTextNode("Ticket");
+    headerRow.appendChild(textNode);
+    table.appendChild(headerRow);
+    for( const [key, value] of Object.entries(jsonData))
+    {
+        let row = document.createElement('tr');
+        let cell1 = document.createElement('td');
+        let cell2 = document.createElement('td');
+        let textNode1 = document.createTextNode(key);
+        let textNode2 = document.createTextNode(value);
+        cell1.appendChild(textNode1);
+        cell2.appendChild(textNode2);
+        row.appendChild(cell1);
+        row.appendChild(cell2);
+        table.appendChild(row);
+    }
+    div.appendChild(table);
+
+    button = document.getElementById("Home");
+    button.addEventListener('click', function(e){
+        e.preventDefault();
+        window.location.href = 'http://localhost:8000/AirlineWebApp';
     });
 }
