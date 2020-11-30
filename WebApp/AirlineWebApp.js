@@ -1,5 +1,5 @@
 var userKey = ["Name", "PhoneNumber", "Email", "CardNumber"];
-var searchKey = ["searchDepartingCity", "searchArrivalCity", "searchStartDate", "SearchendDate", "SearchnumberOfPeople"];
+var searchKey = ["searchDepartingCity", "searchArrivalCity", "searchStartDate", "SearchendDate", "SearchnumberOfPeople", "fareCondition"];
 let tableKey = ['Departing City', 'Arrival City', 'Flight Duration', 'Connecting Flights', 'Fare Condition', 'Price'];
 
 function getInfo()
@@ -127,7 +127,7 @@ async function displayResults()
         
         for(var i = 0; i < table2.rows.length; i++)
             table2.rows[i].classList.remove('selected');
-            
+
         row.classList.add('selected');
         selectedRow = [];
         for(var i = 0; i < row.cells.length; i++)

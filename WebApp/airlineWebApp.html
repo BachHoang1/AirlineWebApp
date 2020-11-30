@@ -19,7 +19,7 @@
                 margin: 0 auto;
                 display: block;
             }
-            label{
+            label,p{
                 color: black;
             }
             input{
@@ -38,6 +38,9 @@
                 background-color: gray;
                 border: 2px solid black;
                 margin: 0 auto;
+            }
+            select{
+                border: 2px solid black;
             }
         </style>
     </head>
@@ -72,6 +75,13 @@
 
             <label for="passengerCount">Number of people:</label>
             <input type="number" id="passengerCount"><br><br>
+
+            <label for="fareCondition"> Fare Condition: </label>
+            <select name="fareCondition" id="fareCondition">
+                <option value="economy">Economy</option>
+                <option value="business">Business class</option>
+                <option value="first">First Class</option>
+            </select><br><br>
     
             <input type="submit" name="submit" value="Search" action="/flightData">
         </form>
