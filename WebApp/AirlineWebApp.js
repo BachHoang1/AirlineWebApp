@@ -18,6 +18,7 @@ function getInfo()
         for(var i = 0; i < columnNames.length; i++)
             flightText += columnNames[i] + ": " + selectedFlight[i] + "<br>";
         
+        flightText += "fare Condition: " + sessionStorage.getItem("fareCondition") + "<br>";
         var UserText = "User information<br><br>";
         for(var i = 0; i < userKey.length; i++)
         {
@@ -214,6 +215,8 @@ async function displayFlight()
     
     for( var i = 0; i < selectedFlight.length; i++)
         body.push(selectedFlight[i]);
+
+    body.push(sessionStorage.getItem("fareCondition"));
 
     for( var i = 0; i < UserInfo.length; i++)
         body.push(UserInfo[i]);
