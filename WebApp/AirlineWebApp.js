@@ -123,10 +123,11 @@ async function displayResults()
 
         row.addEventListener('click', function(){
         for(var i = 0; i < table.rows.length; i++)
-        {
             table.rows[i].classList.remove('selected');
+        
+        for(var i = 0; i < table2.rows.length; i++)
             table2.rows[i].classList.remove('selected');
-        }
+            
         row.classList.add('selected');
         selectedRow = [];
         for(var i = 0; i < row.cells.length; i++)
@@ -176,14 +177,15 @@ async function displayResults()
         table2.appendChild(row);
 
         row.addEventListener('click', function(){
-        for(var i = 0; i < table2.rows.length; i++)
-        {
-            table2.rows[i].classList.remove('selected');
+            for(var i = 0; i < table.rows.length; i++)
             table.rows[i].classList.remove('selected');
-        }
-        row.classList.add('selected');
-        selectedRow = [];
-        for(var i = 0; i < row.cells.length; i++)
+        
+            for(var i = 0; i < table2.rows.length; i++)
+                table2.rows[i].classList.remove('selected');
+
+            row.classList.add('selected');
+            selectedRow = [];
+            for(var i = 0; i < row.cells.length; i++)
             selectedRow.push(row.cells[i].innerText);
         });
     });    
