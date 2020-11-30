@@ -221,6 +221,8 @@ async function displayFlight()
     for( var i = 0; i < UserInfo.length; i++)
         body.push(UserInfo[i]);
 
+    body.push(sessionStorage.getItem("SearchnumberOfPeople"));
+
     const response = await fetch("http://localhost:8000/UserFlight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
