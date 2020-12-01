@@ -19,22 +19,16 @@ var group_id = 3
 var boarding_id = 4
 var passenger_id = 5
 //var path = "C:/Users/Bakh/Documents/password.txt"
-//var data = fs.readFileSync(path, "utf8").split(",");
-/*
+var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt";
+var data = fs.readFileSync(path, "utf8").split(",");
+
 const pool = new Pool({
     user: data[0],
     password: data[1],
     host: "code.cs.uh.edu",
     database: "COSC3380"
 })
-*/
-const pool = new Pool({
-    user: "postgres",
-    password: "Pr0jectD98!",
-    host: "localhost",
-    database: "HW4_test",
-    port: "5432"
-})
+
 
 server.listen(port, host, () => {
     console.log(`Server is running on http://${host}:${port}`);
@@ -175,7 +169,7 @@ if (body.length===17){
             //console.log(`)
             //console.log(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total})`)
             await client.query(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total})`)
-            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', ${phone}, ${group_id})`)
+            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`)
             await client.query(`INSERT INTO reservation VALUES(${booking_no},${reservation_no})`)
             await client.query(`INSERT INTO client_flight VALUES(${ticket_no},${flight_id})`)
             await client.query(`INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id},'${condition}')`)
@@ -194,7 +188,7 @@ if (body.length===17){
                 await client.query('BEGIN')
                 await client.query(`INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, ${price} )`)
                 await client.query(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total})`)
-                await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', ${phone}, ${group_id})`)
+                await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`)
                 await client.query(`INSERT INTO reservation VALUES(${booking_no},${reservation_no})`)
                 await client.query(`INSERT INTO wait_list VALUES(${ticket_no},${flight_id})`)
             //await client.query(`INSERT INTO ticket_flights VALUES(${boarding_id},${ticket_no},'${condition}')`)
@@ -221,16 +215,16 @@ else
     email=body[15];
     credit= body[16];
     number_of_ticket = body[17];
+    group_id = ++group_id;
     //for loop for ticket 
     for(i = 0; i < number_of_ticket; i++)
     {
-        ticket_no = ++ticket_no
-        reservation_no = ++reservation_no
-        booking_no = ++booking_no
-        group_id = ++group_id
-        boarding_id = ++boarding_id
-        passenger_id = ++passenger_id
-        seat_avalible=body[7]
+        ticket_no = ++ticket_no;
+        reservation_no = ++reservation_no;
+        booking_no = ++booking_no;
+        boarding_id = ++boarding_id;
+        passenger_id = ++passenger_id;
+        seat_avalible=body[7];
         //seat_booked=body[8];
         const client = await pool.connect()
         if(condition === "Economy"){
@@ -256,7 +250,7 @@ else
             //console.log(`)
             //console.log(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , 2*${tax}, 2*${total})`)
             await client.query(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , 2*${tax}, 2*${total})`)
-            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', ${phone}, ${group_id})`)
+            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`)
             await client.query(`INSERT INTO reservation VALUES(${booking_no},${reservation_no})`)
             await client.query(`INSERT INTO client_flight VALUES(${ticket_no},${flight_id})`)
             await client.query(`INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id},'${condition}')`)
@@ -267,7 +261,7 @@ else
             await client.query(`UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id2}`)
             ticket_no = ++ticket_no
             boarding_id = ++boarding_id
-            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', ${phone}, ${group_id})`)
+            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`)
             await client.query(`INSERT INTO client_flight VALUES(${ticket_no},${flight_id2})`)
             await client.query(`INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id2},'${condition}')`)
             await client.query(`INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no})`)
@@ -280,6 +274,8 @@ else
         
         // this is for when all flight is booked
         } 
+
+        
     }
 });
   server.post('/Ticket', async(req, res)=>{
