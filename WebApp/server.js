@@ -119,6 +119,7 @@ server.post('/searchDirectResults', async(req, res)=>{
 
 server.post('/UserFlight', async(req, res)=>{
     const body = req.body;
+    const client = await pool.connect();
 if (body.length === 17){
     //then it is a direct flight set up
     flight_id=body[0];
@@ -139,7 +140,6 @@ if (body.length === 17){
         passenger_id = ++passenger_id;
         seat_avalible=body[7];
         //seat_booked=body[8];
-        const client = await pool.connect();
         if(condition === "Economy"){
             price = 500;
             tax = 90;
@@ -211,12 +211,11 @@ else
     {
         ticket_no = ++ticket_no;
         reservation_no = ++reservation_no;
-        booking_no = ++booking_no;
         boarding_id = ++boarding_id;
         passenger_id = ++passenger_id;
+        booking_no = ++booking_no;
         seat_avalible=body[7];
         //seat_booked=body[8];
-        const client = await pool.connect();
         if(condition === "Economy"){
             price = 500;
             tax = 90;
@@ -259,9 +258,9 @@ else
             {
                 res.json(JSON.stringify(err.message));
             }   
-        
+        } 
         // this is for when all flight is booked
-        const result = await client.query(`select tck.ticket_no as tck_no,
+        const result = await client.query(`select distinct tck.ticket_no as tck_no,
         tck.passenger_name as tck_name,
         tck_flight.fare_conditions as fare_condition,
         fl.departure_airport as departure_airport,
@@ -274,9 +273,8 @@ else
         inner join flights fl on clt_flight.flight_id = fl.flight_id
         inner join boarding brd on clt_flight.flight_id = brd.flight_id
         inner join ticket_flights tck_flight on clt_flight.flight_id = tck_flight.flight_id
-        where tck.book_ref = ${booking_no} `);
+        where tck.group_id = '${group_id}' `);
         res.json(result.rows);
-        } 
     }
 });
   server.post('/Ticket', async(req, res)=>{
@@ -286,7 +284,7 @@ else
         const body = req.body;
         ticket_search = body [0];
         const client = await pool.connect();
-        const result = await client.query(`select tck.ticket_no as tck_no,
+        const result = await client.query(`select distinct tck.ticket_no as tck_no,
         tck.passenger_name as tck_name,
         tck_flight.fare_conditions as fare_condition,
         fl.departure_airport as departure_airport,
