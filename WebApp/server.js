@@ -84,6 +84,9 @@ server.post('/searchDirectResults', async(req, res)=>{
     var arrival = body [1];
     var time1 = body [2];
     var time2 = body [3];
+    var fly_type = body [6];
+   // if (fly_type === "One-Way"){
+        
     const client = await pool.connect();
     try{
         //query database for flights based on search fields
@@ -109,7 +112,7 @@ server.post('/searchDirectResults', async(req, res)=>{
         AND fl2.departure_airport NOT LIKE '${depart}' 
         AND fl1.arrival_airport  = fl2.departure_airport
 		AND fl2.scheduled_departure > fl1.scheduled_arrival
-        AND DATE_PART('day', fl2.scheduled_departure::timestamp WITH time zone - fl1.scheduled_arrival::timestamp WITH time zone) < 3
+        AND DATE_PART('day', fl2.scheduled_departure::timestamp WITH time zone - fl1.scheduled_arrival::timestamp WITH time zone) < 2
         AND fl1.seats_available > 0 AND fl2.seats_available > 0;`)
         client.end();
         res.json(result.rows);
@@ -117,18 +120,45 @@ server.post('/searchDirectResults', async(req, res)=>{
     catch(err){
         console.log(err.message);
     }
+    //}   else{
+        
+    //}
   });
 
   server.post('/searchRoundTrip', async(req, res)=>{
     const body = req.body;
     console.log(body);
     const client = await pool.connect();
-
+    var depart = body [0];
+    var arrival = body [1];
+    var time1 = body [2];
+    var time2 = body [3];
     try{
-        //query database for flights based on search fields
-        const result = await client.query(`select * from bookings.aircraft;`);
-        res.json(result.rows);
+        const result = await client.query(`
+        SELECT
+        fl1.flight_id as flight_id_1,
+        fl1.scheduled_departure as time_depfl1,
+        fl1.scheduled_arrival as time_arrfl1,
+        fl1.departure_airport as depfl1,
+        fl1.arrival_airport as arrfl1,
+        fl1.seats_available as seats_available1,
+        fl2.flight_id as flight_id_2,
+        fl2.scheduled_departure as time_depfl2,
+        fl2.scheduled_arrival as time_arrfl2,
+        fl2.departure_airport as depfl2,
+        fl2.arrival_airport as arrfl2,
+        fl2.seats_available as seats_available2
+        FROM flights fl1
+        INNER JOIN flights fl2 ON fl1.departure_airport = '${depart}' AND  fl2.arrival_airport = '${depart}'
+        AND '${time1}' < fl1.scheduled_departure 
+        AND fl1.scheduled_departure < '${time2}'
+        AND fl1.arrival_airport LIKE '${arrival}'
+        AND fl1.arrival_airport  = fl2.departure_airport
+		AND fl2.scheduled_departure > fl1.scheduled_arrival
+        AND DATE_PART('day', fl2.scheduled_departure::timestamp WITH time zone - fl1.scheduled_arrival::timestamp WITH time zone) < 2
+        AND fl1.seats_available > 0 AND fl2.seats_available > 0;`)
         client.end();
+        res.json(result.rows);
     } 
     catch(err){
         console.log(err.message);
