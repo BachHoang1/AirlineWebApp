@@ -1,5 +1,5 @@
 var userKey = ["Name", "PhoneNumber", "Email", "CardNumber"];
-var searchKey = ["searchDepartingCity", "searchArrivalCity", "searchStartDate", "SearchendDate", "SearchnumberOfPeople", "fareCondition"];
+var searchKey = ["searchDepartingCity", "searchArrivalCity", "searchStartDate", "SearchendDate", "SearchnumberOfPeople", "fareCondition", "flightType"];
 let tableKey = ['Departing City', 'Arrival City', 'Flight Duration', 'Connecting Flights', 'Fare Condition', 'Price'];
 
 function getInfo()
@@ -75,23 +75,38 @@ async function displayResults()
 {
     var selectedRow = [];
     var columnNames = [];
+    var columnNames2 = [];
     var searchInfo = [];
+    var response;
     //var searchInfo = JSON.parse(sessionStorage.getItem("searchInfo"));
     for(var i = 0; i < searchKey.length; i++)
     {
         searchInfo.push(sessionStorage.getItem(searchKey[i]));
     }
 
-    //=============================Direct Flight Table==========================
+    //=============================OneWay or RoundTrip Flight Table==========================
 
     const body = searchInfo;
-    const response = await fetch("http://localhost:8000/searchDirectResults", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
+    if(searchInfo[6] == "One-Way")
+    {
+        response = await fetch("http://localhost:8000/searchDirectResults", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+        });
+        document.getElementById('tableTitle').innerHTML = "One-Way Flights";
+    }
+    else
+    {
+        response = await fetch("http://localhost:8000/searchRoundTrip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+        });
+        document.getElementById('tableTitle').innerHTML = "Round Trip Flights";
+    }
     const jsonData = await response.json();
-    console.log(jsonData);
+
 
     for(var key in jsonData[0])
     {
@@ -125,9 +140,11 @@ async function displayResults()
         row.addEventListener('click', function(){
         for(var i = 0; i < table.rows.length; i++)
             table.rows[i].classList.remove('selected');
-        
-        for(var i = 0; i < table2.rows.length; i++)
-            table2.rows[i].classList.remove('selected');
+        if(searchInfo[6] == "One-Way")
+        {
+            for(var i = 0; i < table2.rows.length; i++)
+                table2.rows[i].classList.remove('selected');
+        }
 
         row.classList.add('selected');
         selectedRow = [];
@@ -138,66 +155,72 @@ async function displayResults()
     myTable.appendChild(table);
 
     //=============================Indirect Flight Table==========================
-
-    const response2 = await fetch("http://localhost:8000/searchIndirectResults", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const jsonData2 = await response2.json();
-    console.log(jsonData2);
-
-    columnNames = [];
-    for(var key in jsonData2[0])
-    {
-        var name = key.replace(/_/g,' ');
-        columnNames.push(name);
-    }
-
-    let flights2 = jsonData2;
-    let myTable2 = document.getElementById('table2');
     let table2 = document.createElement('table');
-    let headerRow2 = document.createElement('tr');
-    columnNames.forEach(headerText2 => {
-        let header2 = document.createElement('th');
-        let textNode2 = document.createTextNode(headerText2);
-        header2.appendChild(textNode2);
-        headerRow2.appendChild(header2);
+    if(searchInfo[6] == "One-Way")
+    {
+        const response2 = await fetch("http://localhost:8000/searchIndirectResults", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
         });
- 
-    table2.appendChild(headerRow2);
+        const jsonData2 = await response2.json();
+
+        for(var key in jsonData2[0])
+        {
+            var name = key.replace(/_/g,' ');
+            columnNames2.push(name);
+        }
+
+        document.getElementById('table2Title').innerHTML = "Flights With One Stop";
+        document.querySelector('#table2Title').style.display = "block";
+        let flights2 = jsonData2;
+        let myTable2 = document.getElementById('table2');
+        //let table2 = document.createElement('table');
+        let headerRow2 = document.createElement('tr');
+        columnNames2.forEach(headerText2 => {
+            let header2 = document.createElement('th');
+            let textNode2 = document.createTextNode(headerText2);
+            header2.appendChild(textNode2);
+            headerRow2.appendChild(header2);
+            });
     
-    flights2.forEach(emp => {
-        let row = document.createElement('tr');
-        Object.values(emp).forEach(text => {
-        let cell = document.createElement('td');
-        let textNode = document.createTextNode(text);
-        cell.appendChild(textNode);
-        row.appendChild(cell);
-        })
-        table2.appendChild(row);
-
-        row.addEventListener('click', function(){
-            for(var i = 0; i < table.rows.length; i++)
-            table.rows[i].classList.remove('selected');
+        table2.appendChild(headerRow2);
         
-            for(var i = 0; i < table2.rows.length; i++)
-                table2.rows[i].classList.remove('selected');
+        flights2.forEach(emp => {
+            let row = document.createElement('tr');
+            Object.values(emp).forEach(text => {
+            let cell = document.createElement('td');
+            let textNode = document.createTextNode(text);
+            cell.appendChild(textNode);
+            row.appendChild(cell);
+            })
+            table2.appendChild(row);
 
-            row.classList.add('selected');
-            selectedRow = [];
-            for(var i = 0; i < row.cells.length; i++)
-            selectedRow.push(row.cells[i].innerText);
-        });
-    });    
-    myTable2.appendChild(table2);
+            row.addEventListener('click', function(){
+                for(var i = 0; i < table.rows.length; i++)
+                table.rows[i].classList.remove('selected');
+            
+                for(var i = 0; i < table2.rows.length; i++)
+                    table2.rows[i].classList.remove('selected');
+
+                row.classList.add('selected');
+                selectedRow = [];
+                for(var i = 0; i < row.cells.length; i++)
+                selectedRow.push(row.cells[i].innerText);
+            });
+        });    
+        myTable2.appendChild(table2);
+    }
 
     //=============================Confirm Button==========================
     form = document.getElementById("confirmFlight");
     form.addEventListener('click', function(e){
         e.preventDefault();
         sessionStorage.setItem("selectedFlight", JSON.stringify(selectedRow));
-        sessionStorage.setItem("columnNames", JSON.stringify(columnNames));
+        if(selectedRow.length == columnNames.length)
+            sessionStorage.setItem("columnNames", JSON.stringify(columnNames));
+        else
+            sessionStorage.setItem("columnNames", JSON.stringify(columnNames2));
         window.location.href = 'http://localhost:8000/UserInfo';
     });
 }

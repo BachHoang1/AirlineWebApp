@@ -57,6 +57,7 @@ server.get('/showTicket', function(req, res) {
 
 server.post('/searchDirectResults', async(req, res)=>{
     const body = req.body;
+    console.log(body);
         var depart = body [0];
         var arrival = body [1];
         var time1 = body [2];
@@ -78,6 +79,7 @@ server.post('/searchDirectResults', async(req, res)=>{
 
   server.post('/searchIndirectResults', async(req, res)=>{
     const body = req.body;
+    console.log(body);
     var depart = body [0];
     var arrival = body [1];
     var time1 = body [2];
@@ -111,6 +113,22 @@ server.post('/searchDirectResults', async(req, res)=>{
         AND fl1.seats_available > 0 AND fl2.seats_available > 0;`)
         client.end();
         res.json(result.rows);
+    } 
+    catch(err){
+        console.log(err.message);
+    }
+  });
+
+  server.post('/searchRoundTrip', async(req, res)=>{
+    const body = req.body;
+    console.log(body);
+    const client = await pool.connect();
+
+    try{
+        //query database for flights based on search fields
+        const result = await client.query(`select * from bookings.aircraft;`);
+        res.json(result.rows);
+        client.end();
     } 
     catch(err){
         console.log(err.message);
