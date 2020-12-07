@@ -9,26 +9,26 @@
                 background-image: url("https://wallpapercave.com/wp/wp2025512.jpg");
                 font-family: Arial;
             }
-            table{
-                padding: 10px 10px 10px 10px;
+            tr.selected td {
+                background-color: #333;
+                color: #fff;    
+            }
+            table, th{
+                background: gray;
                 border: 3px solid black;
                 border-collapse: collapse;
                 margin: auto;
                 text-align: center;
-                width: 300px;
+                font-size: 18px;
             }
-            td{
-                border: 3px solid black;
+            tr{
+                border-bottom: 3px solid black;
+            }
+            tr,td, th{
+                padding: 2px 10px 2px 10px;
             }
             p{
                 text-align: center;
-            }
-            #data{
-                background-color: gray;
-                border: 3px solid black;
-                width: 450px;
-                text-align: center;
-                margin: auto;
             }
             input{
                 border: 2px solid black;
@@ -40,18 +40,46 @@
                 border: 2px solid black;
                 margin: 0 auto;
             }
+            div{
+                display: block;
+            }
+            #output{
+                background-color: gray;
+                border: 2px solid black;
+                width: max-content;
+                padding: 5px;
+                text-align: center;
+                margin: auto;
+                font-size: 20px;
+            }
+            #panel{
+                text-align: center;
+                background: gray;
+                border: 3px solid black;
+                width: max-content;
+                margin: auto;
+            }
+            #buttons{
+                text-align: center;
+                display: inline-block;
+            }
         </style>
     </head>
 
     <body onload="javascript:displayTicket()">
         <h1>Airline Web Application</h1><br>
 
-        <div id="data">
-            <p id="output"></p>
-            <div id="flight"></div>
-            <p></p>  
-            <input type="button" id="Home" value="Back to Home">
-            <p></p>
+        <p id="output"></p>
+        <br>
+        <div id="table"></div>
+        <p></p>
+        <div id="panel">
+            <p>To cancel a passengers flight, select a passengers ticket then click remove</p>
+            <div id="buttons">
+                <input type="button" id="confirm" value="Remove">
+                <input type="button" id="Home" value="Back to Home">
+                <p id="result"></p>
+            </div>
         </div>
         <script defer type="text/javascript" src="airlineWebApp.js"></script>
     </body>

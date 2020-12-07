@@ -293,14 +293,13 @@ async function displayFlight()
 
 function checkFlight()
 {
-    var ticketNumber;
+    var flightID;
     form = document.getElementById("checkFlight");
     form.addEventListener('submit', function(e){
         e.preventDefault();
 
-        ticketNumber = form.elements[0].value;
-        console.log(ticketNumber);
-        sessionStorage.setItem("ticketNumber", ticketNumber);
+        flightID = form.elements[0].value;
+        sessionStorage.setItem("flightID", flightID);
 
         window.location.href = 'http://localhost:8000/showTicket';
     });
@@ -308,10 +307,12 @@ function checkFlight()
 
 async function displayTicket()
 {
-    const body =[];
-    body.push(sessionStorage.getItem("ticketNumber"));
+    const body = [];
+    var selectedRow = [];
+    var columnNames = [];
+    body.push(sessionStorage.getItem("flightID"));
 
-    const response = await fetch("http://localhost:8000/Ticket", {
+    const response = await fetch("http://localhost:8000/ticketsForFlight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
@@ -319,31 +320,80 @@ async function displayTicket()
     const jsonData = await response.json();
     console.log(jsonData);
 
-    document.getElementById("output").innerHTML = "Your ticket information";
-    var div = document.getElementById("flight");
-    table = document.createElement('table');
-    let headerRow = document.createElement('th');
-    let textNode = document.createTextNode("Ticket");
-    headerRow.appendChild(textNode);
-    table.appendChild(headerRow);
-    for( const [key, value] of Object.entries(jsonData))
+    if(typeof(jsonData) == "object")
     {
-        let row = document.createElement('tr');
-        let cell1 = document.createElement('td');
-        let cell2 = document.createElement('td');
-        let textNode1 = document.createTextNode(key);
-        let textNode2 = document.createTextNode(value);
-        cell1.appendChild(textNode1);
-        cell2.appendChild(textNode2);
-        row.appendChild(cell1);
-        row.appendChild(cell2);
-        table.appendChild(row);
+        for(var key in jsonData[0])
+        {
+            var name = key.replace(/_/g,' ');
+            columnNames.push(name);
+        }
+        document.getElementById("output").innerHTML = "Tickets for Flight: " + body[0];
+        let flights = jsonData;
+        let myTable = document.getElementById('table');
+        let table = document.createElement('table');
+        let headerRow = document.createElement('tr');
+        columnNames.forEach(headerText => {
+            let header = document.createElement('th');
+            let textNode = document.createTextNode(headerText);
+            header.appendChild(textNode);
+            headerRow.appendChild(header);
+            });
+    
+        table.appendChild(headerRow);
+        
+        flights.forEach(emp => {
+            let row = document.createElement('tr');
+            Object.values(emp).forEach(text => {
+            let cell = document.createElement('td');
+            let textNode = document.createTextNode(text);
+            cell.appendChild(textNode);
+            row.appendChild(cell);
+            })
+            table.appendChild(row);
+
+            row.addEventListener('click', function(){
+            for(var i = 0; i < table.rows.length; i++)
+                table.rows[i].classList.remove('selected');
+
+            row.classList.add('selected');
+            selectedRow = [];
+            for(var i = 0; i < row.cells.length; i++)
+                selectedRow.push(row.cells[i].innerText);
+            });
+        });    
+        myTable.appendChild(table);
     }
-    div.appendChild(table);
+    else
+        document.getElementById("output").innerHTML = "Could not retrieve flights " + body;
 
     button = document.getElementById("Home");
     button.addEventListener('click', function(e){
         e.preventDefault();
+        window.location.href = 'http://localhost:8000/AirlineWebApp';
+        
+    });
+
+    button = document.getElementById("confirm");
+    button.addEventListener('click', async function(e){
+        e.preventDefault();
+        const body = [];
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        for( var i = 0; i < selectedRow.length; i++)
+            body.push(selectedRow[i]);
+
+        const response = await fetch("http://localhost:8000/removeTicket", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+        const jsonData = await response.json();
+        console.log(jsonData);
+        if(jsonData == "completed")
+            document.getElementById("result").innerHTML = "Ticket was removed";
+        else
+            document.getElementById("result").innerHTML = "Ticket was not removed";
+        await delay(2000);
         window.location.href = 'http://localhost:8000/AirlineWebApp';
     });
 }

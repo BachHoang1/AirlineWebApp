@@ -325,29 +325,35 @@ else
         res.json(result.rows);
     }
 });
-  server.post('/Ticket', async(req, res)=>{
+server.post('/ticketsForFlight', async(req, res)=>{
     try{
         //start booking transaction
         //then if successful, return boarding info
         const body = req.body;
+        console.log(body);
         ticket_search = body [0];
         const client = await pool.connect();
-        const result = await client.query(`select distinct tck.ticket_no as tck_no,
-        tck.passenger_name as tck_name,
-        tck_flight.fare_conditions as fare_condition,
-        fl.departure_airport as departure_airport,
-        fl.arrival_airport as arrival_airport,
-        clt_flight.flight_id as flight_id,
-        brd.boarding_time as boarding_time,
-        brd.boarding_gate as boarding_gate
-        from ticket tck 
-        inner join client_flight clt_flight on clt_flight.ticket_no = tck.ticket_no
-        inner join flights fl on clt_flight.flight_id = fl.flight_id
-        inner join boarding brd on clt_flight.flight_id = brd.flight_id
-        inner join ticket_flights tck_flight on clt_flight.flight_id = tck_flight.flight_id
-        where tck.ticket_no = ${ticket_search}`);
+        const result = await client.query(`select * from bookings.aircraft;`);
         client.end();
         res.json(result.rows);
+    } 
+    catch(err){
+        res.json(JSON.stringify(err.message));
+    }
+  });
+
+  server.post('/removeTicket', async(req, res)=>{
+    try{
+        //start booking transaction
+        //then if successful, return boarding info
+        const body = req.body;
+        console.log(body);
+        ticket_search = body [0];
+        const client = await pool.connect();
+        const result = await client.query(`select * from bookings.aircraft;`);
+        client.end();
+
+        res.json("completed");
     } 
     catch(err){
         res.json(JSON.stringify(err.message));
