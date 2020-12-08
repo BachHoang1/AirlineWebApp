@@ -18,6 +18,7 @@ var booking_no = 0;
 var group_id = 3;
 var boarding_id = 4;
 var passenger_id = 5;
+var query = "";
 
 //var path = "C:/Users/Bakh/Documents/password.txt"
 var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt";
@@ -55,29 +56,34 @@ server.get('/showTicket', function(req, res) {
     res.sendFile(__dirname + '/showTicket.html');
 });
 
+server.get('/query', function(req, res) {
+    res.json(query);
+});
+
 server.post('/searchDirectResults', async(req, res)=>{
     const body = req.body;
     console.log(body);
-        var depart = body [0];
-        var arrival = body [1];
-        var time1 = body [2];
-        var time2 = body [3];
-        const client = await pool.connect();
+    var depart = body [0];
+    var arrival = body [1];
+    var time1 = body [2];
+    var time2 = body [3];
+    query = `SELECT *
+    FROM flights WHERE flights.departure_airport LIKE '${depart}' 
+    And flights.arrival_airport LIKE '${arrival}' 
+    And '${time1}' < flights.scheduled_departure 
+    And flights.scheduled_departure < '${time2}';`;
     try{
-        //query database for flights based on search fields
-        const result = await client.query(`SELECT * FROM flights WHERE flights.departure_airport LIKE '${depart}' 
-        and flights.arrival_airport LIKE '${arrival}' 
-        and '${time1}' < flights.scheduled_departure 
-        and flights.scheduled_departure < '${time2}';`);
+        const client = await pool.connect();
+        const result = await client.query(query);
         res.json(result.rows);
         client.end();
     } 
     catch(err){
-        console.log(err.message);
+        res.json(JSON.stringify(err.message));
     }
   });
 
-  server.post('/searchIndirectResults', async(req, res)=>{
+server.post('/searchIndirectResults', async(req, res)=>{
     const body = req.body;
     console.log(body);
     var depart = body [0];
@@ -86,87 +92,87 @@ server.post('/searchDirectResults', async(req, res)=>{
     var time2 = body [3];
     var fly_type = body [6];
    // if (fly_type === "One-Way"){
-        
-    const client = await pool.connect();
+    query = `SELECT
+    fl1.flight_id as flight_id_1,
+    fl1.scheduled_departure as time_depfl1,
+    fl1.scheduled_arrival as time_arrfl1,
+    fl1.departure_airport as depfl1,
+    fl1.arrival_airport as arrfl1,
+    fl1.seats_available as seats_available1,
+    fl2.flight_id as flight_id_2,
+    fl2.scheduled_departure as time_depfl2,
+    fl2.scheduled_arrival as time_arrfl2,
+    fl2.departure_airport as depfl2,
+    fl2.arrival_airport as arrfl2,
+    fl2.seats_available as seats_available2
+    FROM flights fl1
+    INNER JOIN flights fl2 ON fl1.departure_airport = '${depart}' AND  fl2.arrival_airport = '${arrival}'
+    AND '${time1}' < fl1.scheduled_departure 
+    AND fl1.scheduled_departure < '${time2}'
+    AND fl1.arrival_airport NOT LIKE '${arrival}'
+    AND fl2.departure_airport NOT LIKE '${depart}' 
+    AND fl1.arrival_airport  = fl2.departure_airport
+	AND fl2.scheduled_departure > fl1.scheduled_arrival
+    AND DATE_PART('day', fl2.scheduled_departure::timestamp WITH time zone - fl1.scheduled_arrival::timestamp WITH time zone) < 2
+    AND fl1.seats_available > 0 AND fl2.seats_available > 0;`;
     try{
-        //query database for flights based on search fields
-        const result = await client.query(`
-        SELECT
-        fl1.flight_id as flight_id_1,
-        fl1.scheduled_departure as time_depfl1,
-        fl1.scheduled_arrival as time_arrfl1,
-        fl1.departure_airport as depfl1,
-        fl1.arrival_airport as arrfl1,
-        fl1.seats_available as seats_available1,
-        fl2.flight_id as flight_id_2,
-        fl2.scheduled_departure as time_depfl2,
-        fl2.scheduled_arrival as time_arrfl2,
-        fl2.departure_airport as depfl2,
-        fl2.arrival_airport as arrfl2,
-        fl2.seats_available as seats_available2
-        FROM flights fl1
-        INNER JOIN flights fl2 ON fl1.departure_airport = '${depart}' AND  fl2.arrival_airport = '${arrival}'
-        AND '${time1}' < fl1.scheduled_departure 
-        AND fl1.scheduled_departure < '${time2}'
-        AND fl1.arrival_airport NOT LIKE '${arrival}'
-        AND fl2.departure_airport NOT LIKE '${depart}' 
-        AND fl1.arrival_airport  = fl2.departure_airport
-		AND fl2.scheduled_departure > fl1.scheduled_arrival
-        AND DATE_PART('day', fl2.scheduled_departure::timestamp WITH time zone - fl1.scheduled_arrival::timestamp WITH time zone) < 2
-        AND fl1.seats_available > 0 AND fl2.seats_available > 0;`)
+        const client = await pool.connect();
+        const result = await client.query(query);
         client.end();
         res.json(result.rows);
     } 
     catch(err){
-        console.log(err.message);
+        res.json(JSON.stringify(err.message));
     }
     //}   else{
         
     //}
   });
 
-  server.post('/searchRoundTrip', async(req, res)=>{
+server.post('/searchRoundTrip', async(req, res)=>{
     const body = req.body;
     console.log(body);
-    const client = await pool.connect();
     var depart = body [0];
     var arrival = body [1];
     var time1 = body [2];
     var time2 = body [3];
+    query = `SELECT
+    fl1.flight_id as flight_id_1,
+    fl1.scheduled_departure as time_depfl1,
+    fl1.scheduled_arrival as time_arrfl1,
+    fl1.departure_airport as depfl1,
+    fl1.arrival_airport as arrfl1,
+    fl1.seats_available as seats_available1,
+    fl2.flight_id as flight_id_2,
+    fl2.scheduled_departure as time_depfl2,
+    fl2.scheduled_arrival as time_arrfl2,
+    fl2.departure_airport as depfl2,
+    fl2.arrival_airport as arrfl2,
+    fl2.seats_available as seats_available2
+    FROM flights fl1
+    INNER JOIN flights fl2 ON fl1.departure_airport = '${depart}' AND  fl2.arrival_airport = '${depart}'
+    AND '${time1}' < fl1.scheduled_departure 
+    AND fl1.scheduled_departure < '${time2}'
+    AND fl1.arrival_airport LIKE '${arrival}'
+    AND fl1.arrival_airport  = fl2.departure_airport
+    AND fl2.scheduled_departure > fl1.scheduled_arrival
+    AND DATE_PART('day', fl2.scheduled_departure::timestamp WITH time zone - fl1.scheduled_arrival::timestamp WITH time zone) < 2
+    AND fl1.seats_available > 0 AND fl2.seats_available > 0;`;
     try{
-        const result = await client.query(`
-        SELECT
-        fl1.flight_id as flight_id_1,
-        fl1.scheduled_departure as time_depfl1,
-        fl1.scheduled_arrival as time_arrfl1,
-        fl1.departure_airport as depfl1,
-        fl1.arrival_airport as arrfl1,
-        fl1.seats_available as seats_available1,
-        fl2.flight_id as flight_id_2,
-        fl2.scheduled_departure as time_depfl2,
-        fl2.scheduled_arrival as time_arrfl2,
-        fl2.departure_airport as depfl2,
-        fl2.arrival_airport as arrfl2,
-        fl2.seats_available as seats_available2
-        FROM flights fl1
-        INNER JOIN flights fl2 ON fl1.departure_airport = '${depart}' AND  fl2.arrival_airport = '${depart}'
-        AND '${time1}' < fl1.scheduled_departure 
-        AND fl1.scheduled_departure < '${time2}'
-        AND fl1.arrival_airport LIKE '${arrival}'
-        AND fl1.arrival_airport  = fl2.departure_airport
-		AND fl2.scheduled_departure > fl1.scheduled_arrival
-        AND DATE_PART('day', fl2.scheduled_departure::timestamp WITH time zone - fl1.scheduled_arrival::timestamp WITH time zone) < 2
-        AND fl1.seats_available > 0 AND fl2.seats_available > 0;`)
+        const client = await pool.connect();
+        const result = await client.query(query);
         client.end();
         res.json(result.rows);
     } 
     catch(err){
-        console.log(err.message);
+        res.json(JSON.stringify(err.message));
     }
   });
 
 server.post('/UserFlight', async(req, res)=>{
     const body = req.body;
+    var text = "";
+    query = "";
     const client = await pool.connect();
 if (body.length === 17){
     //then it is a direct flight set up
@@ -206,19 +212,19 @@ if (body.length === 17){
         if (seat_avalible > 0)
         {
         try{
-        //start booking transaction
-        //then if successful, return boarding info
-            await client.query('BEGIN');
-            await client.query(`INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, ${price} )`);
-            await client.query(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total})`);
-            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`);
-            await client.query(`INSERT INTO reservation VALUES(${booking_no},${reservation_no})`);
-            await client.query(`INSERT INTO client_flight VALUES(${ticket_no},${flight_id})`);
-            await client.query(`INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id},'${condition}')`);
-            await client.query(`INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no})`);
-            await client.query(`UPDATE flights SET seats_available = seats_available - 1, seats_booked = seats_booked + 1 WHERE flights.flight_id = ${flight_id}`);
-            await client.query(`UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id}`);
-            await client.query('COMMIT');
+            text = `BEGIN;
+            INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, ${price} );
+            INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total});
+            INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id});
+            INSERT INTO reservation VALUES(${booking_no},${reservation_no});
+            INSERT INTO client_flight VALUES(${ticket_no},${flight_id});
+            INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id},'${condition}');
+            INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no});
+            UPDATE flights SET seats_available = seats_available - 1, seats_booked = seats_booked + 1 WHERE flights.flight_id = ${flight_id};
+            UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id};
+            COMMIT;`;
+            await client.query(text);
+            query += "Transaction\n\n" + text + "|";
             }
             catch(err)
             {
@@ -227,13 +233,15 @@ if (body.length === 17){
         }
         else{
             try{
-                await client.query('BEGIN');
-                await client.query(`INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, ${price} )`);
-                await client.query(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total})`);
-                await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`);
-                await client.query(`INSERT INTO reservation VALUES(${booking_no},${reservation_no})`);
-                await client.query(`INSERT INTO wait_list VALUES(${ticket_no},${flight_id})`);
-                await client.query('COMMIT');
+                text = `BEGIN;
+                INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, ${price} );
+                INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total});
+                INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id});
+                INSERT INTO reservation VALUES(${booking_no},${reservation_no});
+                INSERT INTO wait_list VALUES(${ticket_no},${flight_id});
+                COMMIT;`;
+                await client.query(text);
+                query += "Transaction\n\n" + text + "|";
             }
             catch(err)
             {
@@ -280,51 +288,58 @@ else
             total = price + tax;
         }   
         try{
-        //start booking transaction
-        //then if successful, return boarding info
-            await client.query('BEGIN');
-            await client.query(`INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, 2*${price} )`);
-            await client.query(`INSERT INTO payment VALUES (${reservation_no}, ${credit} , 2*${tax}, 2*${total})`);
-            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`);
-            await client.query(`INSERT INTO reservation VALUES(${booking_no},${reservation_no})`);
-            await client.query(`INSERT INTO client_flight VALUES(${ticket_no},${flight_id})`);
-            await client.query(`INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id},'${condition}')`);
-            await client.query(`INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no})`);
-            await client.query(`UPDATE flights SET seats_available = seats_available - 1, seats_booked = seats_booked + 1 WHERE flights.flight_id = ${flight_id}`);
-            await client.query(`UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id}`);
-            await client.query(`UPDATE flights SET seats_available = seats_available - 1, seats_booked = seats_booked + 1 WHERE flights.flight_id = ${flight_id2}`);
-            await client.query(`UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id2}`);
+            text = `BEGIN;
+            INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, 2*${price} );
+            INSERT INTO payment VALUES (${reservation_no}, ${credit} , 2*${tax}, 2*${total});
+            INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id});
+            INSERT INTO reservation VALUES(${booking_no},${reservation_no});
+            INSERT INTO client_flight VALUES(${ticket_no},${flight_id});
+            INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id},'${condition}');
+            INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no});
+            UPDATE flights SET seats_available = seats_available - 1, seats_booked = seats_booked + 1 WHERE flights.flight_id = ${flight_id};
+            UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id};
+            UPDATE flights SET seats_available = seats_available - 1, seats_booked = seats_booked + 1 WHERE flights.flight_id = ${flight_id2};
+            UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id2};`;
+
             ticket_no = ++ticket_no;
             boarding_id = ++boarding_id;
-            await client.query(`INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id})`);
-            await client.query(`INSERT INTO client_flight VALUES(${ticket_no},${flight_id2})`);
-            await client.query(`INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id2},'${condition}')`);
-            await client.query(`INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no})`);
-            await client.query('COMMIT');
+
+            text += `INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id});
+            INSERT INTO client_flight VALUES(${ticket_no},${flight_id2});
+            INSERT INTO ticket_flights VALUES(${boarding_id},${flight_id2},'${condition}');
+            INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no});
+            COMMIT;`;
+            await client.query(text);
+            query += "Transaction\n\n" + text + "|";
             }
             catch(err)
             {
-                res.json(JSON.stringify(err.message));
+                res.json(err.message);
             }   
         } 
         // this is for when all flight is booked
-        const result = await client.query(`select distinct tck.ticket_no as tck_no,
-        tck.passenger_name as tck_name,
+        text = `SELECT DISTINCT 
+        tck.ticket_no as ticket_id,
+        tck.passenger_name as name,
         tck_flight.fare_conditions as fare_condition,
         fl.departure_airport as departure_airport,
         fl.arrival_airport as arrival_airport,
         clt_flight.flight_id as flight_id,
         brd.boarding_time as boarding_time,
         brd.boarding_gate as boarding_gate
-        from ticket tck 
-        inner join client_flight clt_flight on clt_flight.ticket_no = tck.ticket_no
-        inner join flights fl on clt_flight.flight_id = fl.flight_id
-        inner join boarding brd on clt_flight.flight_id = brd.flight_id
-        inner join ticket_flights tck_flight on clt_flight.flight_id = tck_flight.flight_id
-        where tck.group_id = '${group_id}' `);
+        FROM ticket tck 
+        INNER JOIN client_flight clt_flight on clt_flight.ticket_no = tck.ticket_no
+        INNER JOIN flights fl on clt_flight.flight_id = fl.flight_id
+        INNER JOIN boarding brd on clt_flight.flight_id = brd.flight_id
+        INNER JOIN ticket_flights tck_flight on clt_flight.flight_id = tck_flight.flight_id
+        WHERE tck.group_id = '${group_id}'
+        ORDER BY tck.ticket_no;`;
+        const result = await client.query(text);
+        query += "Displays All Tickets\n\n" + text;
         res.json(result.rows);
     }
 });
+
 server.post('/ticketsForFlight', async(req, res)=>{
     try{
         //start booking transaction
@@ -342,7 +357,7 @@ server.post('/ticketsForFlight', async(req, res)=>{
     }
   });
 
-  server.post('/removeTicket', async(req, res)=>{
+server.post('/removeTicket', async(req, res)=>{
     try{
         //start booking transaction
         //then if successful, return boarding info

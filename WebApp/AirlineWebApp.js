@@ -2,6 +2,8 @@ var userKey = ["Name", "PhoneNumber", "Email", "CardNumber"];
 var searchKey = ["searchDepartingCity", "searchArrivalCity", "searchStartDate", "SearchendDate", "SearchnumberOfPeople", "fareCondition", "flightType"];
 let tableKey = ['Departing City', 'Arrival City', 'Flight Duration', 'Connecting Flights', 'Fare Condition', 'Price'];
 
+// stores user information for payment and asks users to confirm flight
+// called in NewUser.html
 function getInfo()
 {  
     form = document.getElementById("UserInfo");
@@ -50,7 +52,8 @@ function getInfo()
         window.location.href = 'http://localhost:8000/bookedFlight';
     });
 }
-
+// stores search criteria and moves to results html
+// called in airlineWebApp.html
 function searchFlights()
 {
     searchInfo = [];
@@ -71,12 +74,15 @@ function searchFlights()
     });
 }
 
+//displays results from search criteria and allows user to select a flight
+//called in flightData.html
 async function displayResults()
 {
     var selectedRow = [];
     var columnNames = [];
     var columnNames2 = [];
     var searchInfo = [];
+    var directQuery, inDirectQuery = "";
     var response;
     //var searchInfo = JSON.parse(sessionStorage.getItem("searchInfo"));
     for(var i = 0; i < searchKey.length; i++)
@@ -107,6 +113,9 @@ async function displayResults()
     }
     const jsonData = await response.json();
 
+    response = await fetch("http://localhost:8000/query")
+    directQuery = await response.json();
+    console.log(directQuery);
 
     for(var key in jsonData[0])
     {
@@ -164,6 +173,10 @@ async function displayResults()
         body: JSON.stringify(body)
         });
         const jsonData2 = await response2.json();
+
+        response = await fetch("http://localhost:8000/query")
+        inDirectQuery = await response.json();
+        console.log(inDirectQuery);
 
         for(var key in jsonData2[0])
         {
@@ -225,10 +238,14 @@ async function displayResults()
     });
 }
 
+// displays all tickets for customer if transactions were successful
+// called in confirmedFlight.html
 async function displayFlight()
 {
     const body = [];
     var UserInfo = [];
+    var response;
+    var query = "";
     var selectedFlight = JSON.parse(sessionStorage.getItem("selectedFlight"));
     //var UserInfo = JSON.parse(sessionStorage.getItem("UserInfo"));
     for(var i = 0; i < userKey.length; i++)
@@ -246,13 +263,17 @@ async function displayFlight()
 
     body.push(sessionStorage.getItem("SearchnumberOfPeople"));
 
-    const response = await fetch("http://localhost:8000/UserFlight", {
+    response = await fetch("http://localhost:8000/UserFlight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
     });
     const jsonData = await response.json();
     console.log(jsonData);
+
+    response = await fetch("http://localhost:8000/query")
+    query = await response.json();
+    console.log(query);
 
     if(typeof(jsonData) == "object")
     {
@@ -282,7 +303,7 @@ async function displayFlight()
         }
     }
     else
-        document.getElementById("output").innerHTML = "Booking was not successful";
+        document.getElementById("output").innerHTML = "Booking was not successful<br>" + jsonData;
 
     button = document.getElementById("Home");
     button.addEventListener('click', function(e){
@@ -291,6 +312,8 @@ async function displayFlight()
     });
 }
 
+//airline admin to search a flights ticket information
+// called in airlineWebApp.html
 function checkFlight()
 {
     var flightID;
@@ -305,11 +328,14 @@ function checkFlight()
     });
 }
 
+//displays all tickets associated with a flight and allows admin to cancel tickets
+//called in showTicket.html
 async function displayTicket()
 {
     const body = [];
     var selectedRow = [];
     var columnNames = [];
+    var query = "";
     body.push(sessionStorage.getItem("flightID"));
 
     const response = await fetch("http://localhost:8000/ticketsForFlight", {
@@ -319,6 +345,10 @@ async function displayTicket()
     });
     const jsonData = await response.json();
     console.log(jsonData);
+
+    response = await fetch("http://localhost:8000/query")
+    query = await response.json();
+    console.log(query);
 
     if(typeof(jsonData) == "object")
     {
