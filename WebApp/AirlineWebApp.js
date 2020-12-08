@@ -336,14 +336,15 @@ async function displayTicket()
     var selectedRow = [];
     var columnNames = [];
     var query = "";
+    var response, jsonData;
     body.push(sessionStorage.getItem("flightID"));
 
-    const response = await fetch("http://localhost:8000/ticketsForFlight", {
+    response = await fetch("http://localhost:8000/ticketsForFlight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
     });
-    const jsonData = await response.json();
+    jsonData = await response.json();
     console.log(jsonData);
 
     response = await fetch("http://localhost:8000/query")
@@ -412,12 +413,12 @@ async function displayTicket()
         for( var i = 0; i < selectedRow.length; i++)
             body.push(selectedRow[i]);
 
-        const response = await fetch("http://localhost:8000/removeTicket", {
+        response = await fetch("http://localhost:8000/removeTicket", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body)
         });
-        const jsonData = await response.json();
+        jsonData = await response.json();
         console.log(jsonData);
         if(jsonData == "completed")
             document.getElementById("result").innerHTML = "Ticket was removed";
