@@ -1,6 +1,5 @@
 var userKey = ["Name", "PhoneNumber", "Email", "CardNumber"];
 var searchKey = ["searchDepartingCity", "searchArrivalCity", "searchStartDate", "SearchendDate", "SearchnumberOfPeople", "fareCondition", "flightType"];
-let tableKey = ['Departing City', 'Arrival City', 'Flight Duration', 'Connecting Flights', 'Fare Condition', 'Price'];
 
 // stores user information for payment and asks users to confirm flight
 // called in NewUser.html
@@ -82,8 +81,8 @@ async function displayResults()
     var columnNames = [];
     var columnNames2 = [];
     var searchInfo = [];
-    var directQuery, inDirectQuery = "";
-    var response;
+    var directQuery, inDirectQuery, title, selected = "";
+    var response, totalPrice;
     //var searchInfo = JSON.parse(sessionStorage.getItem("searchInfo"));
     for(var i = 0; i < searchKey.length; i++)
     {
@@ -100,7 +99,7 @@ async function displayResults()
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
         });
-        document.getElementById('tableTitle').innerHTML = "One-Way Flights";
+        title = "One-Way Flights<br>Price per Seat: ";
     }
     else
     {
@@ -109,13 +108,31 @@ async function displayResults()
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
         });
-        document.getElementById('tableTitle').innerHTML = "Round Trip Flights";
+        title = "Round Trip Flights<br>Price per Seat: ";
     }
     const jsonData = await response.json();
+
+    if(searchInfo[5] == "Economy")
+    {
+        title += "$500";
+        totalPrice = 590; // tax included
+    }
+    else if (searchInfo[5] == "Comfort")
+    {
+        title += "$600";
+        totalPrice = 700;
+    }
+    else if (searchInfo[5] == "Business")
+    {
+        title += "$700";
+        totalPrice = 820;
+    }
+    document.getElementById('tableTitle').innerHTML = title;
 
     response = await fetch("http://localhost:8000/query")
     directQuery = await response.json();
     console.log(directQuery);
+    directQuery = directQuery.replace(/(?:\r\n|\r|\n)/g, '<br>');
 
     for(var key in jsonData[0])
     {
@@ -151,9 +168,12 @@ async function displayResults()
             table.rows[i].classList.remove('selected');
         if(searchInfo[6] == "One-Way")
         {
+            selected = "One-Way";
             for(var i = 0; i < table2.rows.length; i++)
                 table2.rows[i].classList.remove('selected');
         }
+        else
+            selected = "roundTrip";
 
         row.classList.add('selected');
         selectedRow = [];
@@ -177,6 +197,7 @@ async function displayResults()
         response = await fetch("http://localhost:8000/query")
         inDirectQuery = await response.json();
         console.log(inDirectQuery);
+        inDirectQuery = inDirectQuery.replace(/(?:\r\n|\r|\n)/g, '<br>');
 
         for(var key in jsonData2[0])
         {
@@ -216,16 +237,17 @@ async function displayResults()
                 for(var i = 0; i < table2.rows.length; i++)
                     table2.rows[i].classList.remove('selected');
 
+                selected = "inDirect";
                 row.classList.add('selected');
                 selectedRow = [];
                 for(var i = 0; i < row.cells.length; i++)
-                selectedRow.push(row.cells[i].innerText);
+                    selectedRow.push(row.cells[i].innerText);
             });
         });    
         myTable2.appendChild(table2);
     }
 
-    //=============================Confirm Button==========================
+    //=============================Buttons=========================
     form = document.getElementById("confirmFlight");
     form.addEventListener('click', function(e){
         e.preventDefault();
@@ -234,8 +256,16 @@ async function displayResults()
             sessionStorage.setItem("columnNames", JSON.stringify(columnNames));
         else
             sessionStorage.setItem("columnNames", JSON.stringify(columnNames2));
+
+        if(selected == "One-Way")
+            totalPrice *= searchInfo[4];
+        else if(selected == "roundTrip" || selected == "inDirect")
+            totalPrice  = totalPrice * (searchInfo[4] * 2);
+        sessionStorage.setItem("totalPrice", JSON.stringify(totalPrice));
         window.location.href = 'http://localhost:8000/UserInfo';
     });
+
+    showQuery(directQuery + "<br><br>" + inDirectQuery);
 }
 
 // displays all tickets for customer if transactions were successful
@@ -274,6 +304,7 @@ async function displayFlight()
     response = await fetch("http://localhost:8000/query")
     query = await response.json();
     console.log(query);
+    query = query.replace(/(?:\r\n|\r|\n)/g, '<br>');
 
     if(typeof(jsonData) == "object")
     {
@@ -310,6 +341,8 @@ async function displayFlight()
         e.preventDefault();
         window.location.href = 'http://localhost:8000/AirlineWebApp';
     });
+
+    showQuery(query);
 }
 
 //airline admin to search a flights ticket information
@@ -350,6 +383,7 @@ async function displayTicket()
     response = await fetch("http://localhost:8000/query")
     query = await response.json();
     console.log(query);
+    query = query.replace(/(?:\r\n|\r|\n)/g, '<br>');
 
     if(typeof(jsonData) == "object")
     {
@@ -427,4 +461,32 @@ async function displayTicket()
         await delay(2000);
         window.location.href = 'http://localhost:8000/AirlineWebApp';
     });
+
+    showQuery(query);
+}
+
+function showQuery(query){
+    text = document.getElementById("Query");
+    text.innerHTML = query;
+    style = getComputedStyle(text);
+    showQuery = document.getElementById("showQueries");
+    showQuery.addEventListener('click', function(e){
+        e.preventDefault();
+        if(style.display == "none")
+        {
+            showQuery.value = "Hide Query";
+            text.style.display = "block";
+        }
+        else
+        {
+            showQuery.value = "Show Query";
+            text.style.display = "none";
+        }
+    });
+}
+
+function getPrice(){
+    price = document.getElementById('price');
+    totalPrice = sessionStorage.getItem("totalPrice");
+    price.innerHTML = "Total cost: $" + totalPrice;
 }

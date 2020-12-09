@@ -33,7 +33,7 @@
                 margin: 0 auto;
             }
             h3{
-                width: 210px;
+                width: 280px;
                 text-align: center;
                 background-color: gray;
                 border: 2px solid black;
@@ -84,13 +84,18 @@
                 text-align: left;
                 border: 2px solid black;             
             }
+            #price{
+                color: black;
+                font-size: 20px;
+            }
         </style>
     </head>
 
-    <body>
+    <body onload="javascript:getPrice()">
         <h1>Airline Web Application</h1><br>
-        <h3>Enter your Information</h3><br>
+        <h3>Enter Your Information To Pay</h3><br>
         <form id="UserInfo" onclick="javascript:getInfo()">
+            <p id="price"></p>
             <label for="fname"> Name: </label>
             <input type="text" id="fname" name="fname" required="required"><br><br>
 

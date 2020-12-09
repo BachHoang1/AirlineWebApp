@@ -45,6 +45,21 @@
                 border: 2px solid black;
                 margin: 0 auto;
             }
+            #Query{
+                width: max-content;
+                padding: 5px;
+                text-align: left;
+                font-size: 10px;
+                display: none;
+            }
+            #showSQL{
+                background-color: gray;
+                border: 2px solid black;
+                width: max-content;
+                margin: auto;
+                text-align: center;
+                padding: 10px;
+            }
         </style>
     </head>
 
@@ -57,6 +72,11 @@
             <p></p>  
             <input type="button" id="Home" value="Back to Home">
             <p></p>
+        </div>
+        <br>
+        <div id="showSQL">
+            <input type="button" id="showQueries" value="Show Query">
+            <p id="Query"></p>
         </div>
         <script defer type="text/javascript" src="airlineWebApp.js"></script>
     </body>

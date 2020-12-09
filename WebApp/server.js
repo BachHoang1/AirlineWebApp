@@ -224,7 +224,7 @@ if (body.length === 17){
             UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id};
             COMMIT;`;
             await client.query(text);
-            query += "Transaction\n\n" + text + "|";
+            query += "Transaction\n\n" + text + "\n\n";
             }
             catch(err)
             {
@@ -241,7 +241,7 @@ if (body.length === 17){
                 INSERT INTO wait_list VALUES(${ticket_no},${flight_id});
                 COMMIT;`;
                 await client.query(text);
-                query += "Transaction\n\n" + text + "|";
+                query += "Transaction\n\n" + text + "\n\n";
             }
             catch(err)
             {
@@ -310,7 +310,7 @@ else
             INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no});
             COMMIT;`;
             await client.query(text);
-            query += "Transaction\n\n" + text + "|";
+            query += "Transaction\n\n" + text + "\n\n";
             }
             catch(err)
             {
@@ -335,7 +335,7 @@ else
         WHERE tck.group_id = '${group_id}'
         ORDER BY tck.ticket_no;`;
         const result = await client.query(text);
-        query += "Displays All Tickets\n\n" + text;
+        query += "\n\nDisplays All Tickets\n\n" + text;
         res.json(result.rows);
     }
 });
