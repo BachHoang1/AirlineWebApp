@@ -21,8 +21,8 @@ var passenger_id = 5;
 var query = "";
 
 //var path = "C:/Users/Bakh/Documents/password.txt"
-var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt";
-var data = fs.readFileSync(path, "utf8").split(",");
+//var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt";
+/*var data = fs.readFileSync(path, "utf8").split(",");
 
 const pool = new Pool({
     user: data[0],
@@ -30,6 +30,14 @@ const pool = new Pool({
     host: "code.cs.uh.edu",
     database: "COSC3380"
 })
+*/
+const pool = new Pool({
+    user: "postgres",
+    password: "Pr0jectD98!",
+    host: "localhost",
+    database: "HW4"
+})
+
 
 
 server.listen(port, host, () => {
@@ -196,17 +204,17 @@ if (body.length === 17){
         //seat_booked=body[8];
         if(condition === "Economy"){
             price = 500;
-            tax = 90;
+            tax = price*5/100;
             total = price + tax;
         }
         else if(condition === "Comfort"){
             price = 600;
-            tax = 100;
+            tax = price*5/100;
             total = price + tax;
         }
         else {
             price = 700;
-            tax = 120;
+            tax = price*5/100;
             total = price + tax;
         }   
         if (seat_avalible > 0)
@@ -236,9 +244,11 @@ if (body.length === 17){
                 text = `BEGIN;
                 INSERT INTO bookings VALUES(${booking_no} , CURRENT_TIMESTAMP, ${price} );
                 INSERT INTO payment VALUES (${reservation_no}, ${credit} , ${tax}, ${total});
-                INSERT INTO ticket VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id});
+                INSERT INTO wait_list_info VALUES(${ticket_no}, ${booking_no} , ${passenger_id}, '${name}', '${email}', '${phone}', ${group_id});
                 INSERT INTO reservation VALUES(${booking_no},${reservation_no});
                 INSERT INTO wait_list VALUES(${ticket_no},${flight_id});
+                INSERT INTO ticket_flights_wait VALUES(${boarding_id},${flight_id},'${condition}');
+                INSERT INTO ticket_boarding_wait VALUES(${boarding_id},${ticket_no});
                 COMMIT;`;
                 await client.query(text);
                 query += "Transaction\n\n" + text + "\n\n";
@@ -274,17 +284,17 @@ else
         //seat_booked=body[8];
         if(condition === "Economy"){
             price = 500;
-            tax = 90;
+            tax = price*5/100;
             total = price + tax;
         }
         else if(condition === "Comfort"){
             price = 600;
-            tax = 100;
+            tax = price*5/100;
             total = price + tax;
         }
         else {
             price = 700;
-            tax = 120;
+            tax = price*5/100;
             total = price + tax;
         }   
         try{
@@ -348,7 +358,17 @@ server.post('/ticketsForFlight', async(req, res)=>{
         console.log(body);
         ticket_search = body [0];
         const client = await pool.connect();
-        const result = await client.query(`select * from bookings.aircraft;`);
+        query = `SELECT tck.ticket_no as ticket_no,
+		tck.book_ref as book_ref,
+		tck.passenger_id as passenger_id,
+		tck.passenger_name as passenger_name,
+		tck.email as email,
+		tck.phone as phone,
+		tck.group_id as group_id
+        FROM ticket tck
+        INNER JOIN client_flight on tck.ticket_no = client_flight.ticket_no
+        WHERE client_flight.flight_id = ${ticket_search}`;
+        const result = await client.query(query);
         client.end();
         res.json(result.rows);
     } 
@@ -363,9 +383,126 @@ server.post('/removeTicket', async(req, res)=>{
         //then if successful, return boarding info
         const body = req.body;
         console.log(body);
-        ticket_search = body [0];
+        flight_id = body[0];
+        book_ref = body [2];
         const client = await pool.connect();
-        const result = await client.query(`select * from bookings.aircraft;`);
+        query = `BEGIN;
+        ALTER TABLE client_flight DROP CONSTRAINT client_flight_ticket_no;
+        ALTER TABLE client_flight DROP CONSTRAINT client_flight_flight_id;
+        ALTER TABLE ticket_boarding DROP CONSTRAINT ticket_boarding_ticket_no_fkey;
+        ALTER TABLE ticket_boarding DROP CONSTRAINT ticket_boarding_boarding_id_fkey;
+        ALTER TABLE ticket_flights DROP CONSTRAINT ticket_flights_flight_id_fkey;
+        ALTER TABLE ticket_flights DROP CONSTRAINT ticket_flights_fare_conditions;
+        ALTER TABLE ticket DROP CONSTRAINT ticket_book_ref_fkey;
+        ALTER TABLE reservation DROP CONSTRAINT reservation_reservation_no_fkey;
+        DELETE 
+        FROM ticket_flights as tf
+        USING ticket_boarding as tb, ticket as tck
+        WHERE tb.boarding_id = tf.boarding_id AND
+        tck.ticket_no = tb.ticket_no AND
+        tck.book_ref = ${book_ref};
+        DELETE  
+        FROM client_flight cf
+	    USING ticket tck
+        WHERE tck.ticket_no = cf.ticket_no AND
+        tck.book_ref = ${book_ref};	 
+        DELETE  
+        FROM ticket_boarding tb 
+	    USING ticket tck
+        WHERE tck.ticket_no = tb.ticket_no AND
+        tck.book_ref = ${book_ref};	 
+        DELETE 
+        FROM
+        ticket tck
+        WHERE tck.book_ref = ${book_ref};
+        DELETE 
+        FROM payment pm 
+        USING reservation rs 
+        WHERE pm.reservation_no  = rs.reservation_no AND
+        rs.book_ref = ${book_ref};
+        DELETE 
+        FROM
+        reservation rs 
+        WHERE rs.book_ref = ${book_ref};
+        ALTER TABLE client_flight ADD CONSTRAINT client_flight_ticket_no FOREIGN KEY (ticket_no) REFERENCES ticket(ticket_no) ON DELETE CASCADE;
+        ALTER TABLE client_flight ADD CONSTRAINT client_flight_flight_id FOREIGN KEY (flight_id) REFERENCES flights(flight_id) ON DELETE CASCADE;
+        ALTER TABLE ticket_boarding ADD CONSTRAINT ticket_boarding_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES ticket(ticket_no) ON DELETE CASCADE;
+        ALTER TABLE ticket_boarding ADD CONSTRAINT ticket_boarding_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights(boarding_id) ON DELETE CASCADE;
+        ALTER TABLE ticket_flights ADD CONSTRAINT ticket_flights_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id) ON DELETE CASCADE;
+        ALTER TABLE ticket_flights ADD CONSTRAINT ticket_flights_fare_conditions FOREIGN KEY (fare_conditions) REFERENCES fare_price(fare_conditions) ON DELETE CASCADE;
+        ALTER TABLE ticket ADD CONSTRAINT ticket_book_ref_fkey FOREIGN KEY (book_ref) REFERENCES bookings(book_ref) ON DELETE CASCADE;
+        ALTER TABLE reservation ADD CONSTRAINT reservation_reservation_no_fkey
+        FOREIGN KEY (reservation_no) 
+        REFERENCES payment(reservation_no)
+        ON DELETE CASCADE;
+        ALTER TABLE ticket DROP CONSTRAINT ticket_book_ref_fkey;
+        ALTER TABLE ticket_flights DROP CONSTRAINT ticket_flights_flight_id_fkey;
+        ALTER TABLE ticket_flights DROP CONSTRAINT ticket_flights_fare_conditions;
+        ALTER TABLE ticket_boarding DROP CONSTRAINT ticket_boarding_ticket_no_fkey;
+        ALTER TABLE ticket_boarding DROP CONSTRAINT ticket_boarding_boarding_id_fkey;
+        ALTER TABLE client_flight DROP CONSTRAINT client_flight_ticket_no;
+        ALTER TABLE client_flight DROP CONSTRAINT client_flight_flight_id;
+        insert into ticket (ticket_no, book_ref, passenger_id, passenger_name, email, phone, group_id)
+        select wli.ticket_no, wli.book_ref, wli.passenger_id, wli.passenger_name, wli.email, wli.phone, wli.group_id from wait_list_info as wli
+        inner join wait_list wl on wli.ticket_no = wl.ticket_no
+        where wl.flight_id = ${flight_id}
+        LIMIT 1;
+        insert into ticket_flights (boarding_id, flight_id, fare_conditions)
+        select tfw.boarding_id, tfw.flight_id, tfw.fare_conditions from ticket_flights_wait as tfw
+        where tfw.flight_id = ${flight_id}
+        LIMIT 1;
+        insert into ticket_boarding (boarding_id, ticket_no)
+        select tbw.boarding_id, tbw.ticket_no from ticket_boarding_wait as tbw
+        inner join wait_list wl on tbw.ticket_no = wl.ticket_no
+        where wl.flight_id = ${flight_id}
+        LIMIT 1;
+        INSERT INTO client_flight(ticket_no, flight_id)
+        select wl.ticket_no, wl.flight_id from wait_list as wl
+        where wl.flight_id = ${flight_id}
+        LIMIT 1;
+        ALTER TABLE ticket ADD CONSTRAINT ticket_book_ref_fkey FOREIGN KEY (book_ref) REFERENCES bookings(book_ref) ON DELETE CASCADE;
+        ALTER TABLE ticket_flights ADD CONSTRAINT ticket_flights_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id) ON DELETE CASCADE;
+        ALTER TABLE ticket_flights ADD CONSTRAINT ticket_flights_fare_conditions FOREIGN KEY (fare_conditions) REFERENCES fare_price(fare_conditions) ON DELETE CASCADE;
+        ALTER TABLE ticket_boarding ADD CONSTRAINT ticket_boarding_ticket_no_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights(boarding_id) ON DELETE CASCADE;
+        ALTER TABLE ticket_boarding ADD CONSTRAINT ticket_boarding_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights(boarding_id) ON DELETE CASCADE;
+        ALter table client_flight ADD CONSTRAINT client_flight_ticket_no FOREIGN KEY (ticket_no) REFERENCES ticket(ticket_no) ON DELETE CASCADE;
+        ALter table client_flight ADD CONSTRAINT client_flight_flight_id FOREIGN KEY (flight_id) REFERENCES flights(flight_id) ON DELETE CASCADE;
+        ALTER TABLE wait_list_info DROP CONSTRAINT wait_list_book_ref_fkey;
+        ALter table wait_list DROP CONSTRAINT wait_list_ticket_no_fkey;
+        ALter table wait_list DROP CONSTRAINT wait_list_flight_id_fkey;
+        ALter table ticket_flights_wait DROP CONSTRAINT ticket_flights_wait_flight_id_fkey;
+        ALter table ticket_flights_wait DROP CONSTRAINT ticket_flights_wait_fare_conditions;
+        ALter table ticket_boarding_wait DROP CONSTRAINT ticket_boarding_wait_ticket_no_fkey;
+        ALter table ticket_boarding_wait DROP CONSTRAINT ticket_boarding_wait_boarding_id_fkey;
+        DELETE 
+        FROM wait_list_info as wli
+        WHERE wli.ticket_no IN(select ticket_no
+                                 from wait_list as wl
+                                 where wl.flight_id = ${flight_id} LIMIT 1);
+        DELETE 
+        from ticket_flights_wait as tfw
+        where ctid IN (select ctid 
+                                 from ticket_flights_wait
+                                 where flight_id = ${flight_id} LIMIT 1);
+        DELETE 
+        from ticket_boarding_wait as tbw
+        WHERE tbw.ticket_no IN(select ticket_no
+                                 from wait_list as wl
+                                 where wl.flight_id = ${flight_id} LIMIT 1);
+        DELETE 
+        FROM wait_list as wl
+        Where ctid in (select ctid 
+                       from wait_list 
+                       where flight_id = ${flight_id} LIMIT 1);
+        ALTER TABLE wait_list_info ADD CONSTRAINT wait_list_book_ref_fkey FOREIGN KEY (book_ref) REFERENCES bookings(book_ref) ON DELETE CASCADE;
+        ALTER TABLE wait_list ADD CONSTRAINT wait_list_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES wait_list_info(ticket_no) ON DELETE CASCADE;
+        ALTER TABLE wait_list ADD CONSTRAINT wait_list_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id)ON DELETE CASCADE;
+        ALTER TABLE ticket_flights_wait ADD CONSTRAINT ticket_flights_wait_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id) ON DELETE CASCADE;
+        ALTER TABLE ticket_flights_wait ADD CONSTRAINT ticket_flights_wait_fare_conditions FOREIGN KEY (fare_conditions) REFERENCES fare_price(fare_conditions) ON DELETE CASCADE;
+        ALTER TABLE ticket_boarding_wait ADD CONSTRAINT ticket_boarding_wait_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES wait_list_info(ticket_no) ON DELETE CASCADE;
+        ALTER TABLE ticket_boarding_wait ADD CONSTRAINT ticket_boarding_wait_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights_wait(boarding_id) ON DELETE CASCADE;
+        END;`;
+        const result = await client.query(query);
         client.end();
 
         res.json("completed");
