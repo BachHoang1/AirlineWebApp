@@ -21,8 +21,8 @@ var passenger_id = 5;
 var query = "";
 
 //var path = "C:/Users/Bakh/Documents/password.txt"
-//var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt";
-/*var data = fs.readFileSync(path, "utf8").split(",");
+var path = "C:/Users/beast/OneDrive/Documents/Javascript/password.txt";
+var data = fs.readFileSync(path, "utf8").split(",");
 
 const pool = new Pool({
     user: data[0],
@@ -30,15 +30,6 @@ const pool = new Pool({
     host: "code.cs.uh.edu",
     database: "COSC3380"
 })
-*/
-const pool = new Pool({
-    user: "postgres",
-    password: "Pr0jectD98!",
-    host: "localhost",
-    database: "HW4"
-})
-
-
 
 server.listen(port, host, () => {
     console.log(`Server is running on http://${host}:${port}`);
@@ -257,7 +248,26 @@ if (body.length === 17){
             {
                 res.json(JSON.stringify(err.message));  
             }
-        } 
+        }
+        text = `SELECT DISTINCT 
+        tck.ticket_no as ticket_id,
+        tck.passenger_name as name,
+        tck_flight.fare_conditions as fare_condition,
+        fl.departure_airport as departure_airport,
+        fl.arrival_airport as arrival_airport,
+        clt_flight.flight_id as flight_id,
+        brd.boarding_time as boarding_time,
+        brd.boarding_gate as boarding_gate
+        FROM ticket tck 
+        INNER JOIN client_flight clt_flight on clt_flight.ticket_no = tck.ticket_no
+        INNER JOIN flights fl on clt_flight.flight_id = fl.flight_id
+        INNER JOIN boarding brd on clt_flight.flight_id = brd.flight_id
+        INNER JOIN ticket_flights tck_flight on clt_flight.flight_id = tck_flight.flight_id
+        WHERE tck.group_id = '${group_id}'
+        ORDER BY tck.ticket_no;`;
+        const result = await client.query(text);
+        query += "\n\nDisplays All Tickets\n\n" + text;
+        res.json(result.rows); 
     }
 }
 else
