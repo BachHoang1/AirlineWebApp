@@ -13,6 +13,9 @@ DROP TABLE IF EXISTS client_flight CASCADE;
 DROP TABLE IF EXISTS payment CASCADE;
 DROP TABLE IF EXISTS reservation CASCADE;
 DROP TABLE IF EXISTS ticket_boarding CASCADE;
+DROP TABLE IF EXISTS wait_list_info CASCADE;
+DROP TABLE IF EXISTS ticket_flights_wait CASCADE;
+DROP TABLE IF EXISTS ticket_boarding_wait CASCADE;
 
 CREATE TABLE airport (
     airport_code char(3) NOT NULL,
@@ -79,7 +82,7 @@ CREATE TABLE payment (
 CREATE TABLE reservation (
     book_ref integer NOT NULL,
     reservation_no integer NOT NULL,
-    PRIMARY KEY(book_ref),
+    PRIMARY KEY(book_ref,reservation_no),
     CONSTRAINT reservation_book_ref_fkey FOREIGN KEY (book_ref) REFERENCES bookings(book_ref),
     CONSTRAINT reservation_reservation_no_fkey FOREIGN KEY (reservation_no) REFERENCES payment(reservation_no)
 );
@@ -90,10 +93,22 @@ CREATE TABLE ticket(
     passenger_id varchar(20) NOT NULL,
     passenger_name text,
     email char(50),
-    phone char(15),
+    phone text,
     group_id char(6),
     PRIMARY KEY (ticket_no),
     CONSTRAINT ticket_book_ref_fkey FOREIGN KEY (book_ref) REFERENCES bookings(book_ref)
+);
+
+CREATE TABLE wait_list_info(
+    ticket_no integer NOT NULL,
+    book_ref integer NOT NULL,
+    passenger_id varchar(20) NOT NULL,
+    passenger_name text,
+    email char(50),
+    phone text,
+    group_id char(6),
+    PRIMARY KEY (ticket_no),
+    CONSTRAINT wait_list_book_ref_fkey FOREIGN KEY (book_ref) REFERENCES bookings(book_ref)
 );
 
 CREATE TABLE flights (
@@ -160,6 +175,23 @@ CREATE TABLE ticket_boarding(
     CONSTRAINT ticket_boarding_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights(boarding_id)
 );
 
+CREATE TABLE ticket_flights_wait(
+    boarding_id integer NOT NULL,
+    flight_id integer NOT NULL,
+    fare_conditions character varying(10) NOT NULL,
+    PRIMARY KEY (boarding_id),
+    CONSTRAINT ticket_flights_wait_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id),
+    CONSTRAINT ticket_flights_wait_fare_conditions FOREIGN KEY (fare_conditions) REFERENCES fare_price(fare_conditions)
+);
+
+CREATE TABLE ticket_boarding_wait(
+    boarding_id integer NOT NULL,
+	ticket_no integer NOT NULL,
+    PRIMARY KEY (boarding_id,ticket_no),
+	CONSTRAINT ticket_boarding_wait_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES wait_list_info(ticket_no),
+    CONSTRAINT ticket_boarding_wait_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights_wait(boarding_id)
+);
+
 CREATE TABLE boarding(
 	flight_id integer NOT NULL,
 	boarding_time timestamp WITH time zone NOT NULL,
@@ -171,8 +203,8 @@ CREATE TABLE boarding(
 CREATE TABLE wait_list (
     ticket_no integer NOT NULL,
     flight_id integer NOT NULL,
-    PRIMARY KEY(ticket_no),
-    CONSTRAINT wait_list_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES ticket(ticket_no),
+    PRIMARY KEY(ticket_no,flight_id),
+    CONSTRAINT wait_list_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES wait_list_info(ticket_no),
 	CONSTRAINT wait_list_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id)
 );
 
