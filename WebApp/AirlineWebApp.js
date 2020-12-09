@@ -74,6 +74,7 @@ function searchFlights()
 }
 
 //displays results from search criteria and allows user to select a flight
+// calculates the total cost of all tickets based on flight choosen
 //called in flightData.html
 async function displayResults()
 {
@@ -83,6 +84,7 @@ async function displayResults()
     var searchInfo = [];
     var directQuery, inDirectQuery, title, selected = "";
     var response, totalPrice;
+    var tax = .05;
     //var searchInfo = JSON.parse(sessionStorage.getItem("searchInfo"));
     for(var i = 0; i < searchKey.length; i++)
     {
@@ -115,17 +117,17 @@ async function displayResults()
     if(searchInfo[5] == "Economy")
     {
         title += "$500";
-        totalPrice = 590; // tax included
+        totalPrice = 500 * (1 + tax);
     }
     else if (searchInfo[5] == "Comfort")
     {
         title += "$600";
-        totalPrice = 700;
+        totalPrice = 600 * (1 + tax);
     }
     else if (searchInfo[5] == "Business")
     {
         title += "$700";
-        totalPrice = 820;
+        totalPrice = 700 * (1 + tax);
     }
     document.getElementById('tableTitle').innerHTML = title;
 
@@ -251,18 +253,21 @@ async function displayResults()
     form = document.getElementById("confirmFlight");
     form.addEventListener('click', function(e){
         e.preventDefault();
-        sessionStorage.setItem("selectedFlight", JSON.stringify(selectedRow));
-        if(selectedRow.length == columnNames.length)
-            sessionStorage.setItem("columnNames", JSON.stringify(columnNames));
-        else
-            sessionStorage.setItem("columnNames", JSON.stringify(columnNames2));
+        if(selectedRow.length > 0)
+        {
+            sessionStorage.setItem("selectedFlight", JSON.stringify(selectedRow));
+            if(selectedRow.length == columnNames.length)
+                sessionStorage.setItem("columnNames", JSON.stringify(columnNames));
+            else
+                sessionStorage.setItem("columnNames", JSON.stringify(columnNames2));
 
-        if(selected == "One-Way")
-            totalPrice *= searchInfo[4];
-        else if(selected == "roundTrip" || selected == "inDirect")
-            totalPrice  = totalPrice * (searchInfo[4] * 2);
-        sessionStorage.setItem("totalPrice", JSON.stringify(totalPrice));
-        window.location.href = 'http://localhost:8000/UserInfo';
+            if(selected == "One-Way")
+                totalPrice *= searchInfo[4];
+            else if(selected == "roundTrip" || selected == "inDirect")
+                totalPrice  = totalPrice * (searchInfo[4] * 2);
+            sessionStorage.setItem("totalPrice", JSON.stringify(totalPrice));
+            window.location.href = 'http://localhost:8000/UserInfo';
+        }
     });
 
     showQuery(directQuery + "<br><br>" + inDirectQuery);
@@ -444,6 +449,7 @@ async function displayTicket()
         const body = [];
         const delay = ms => new Promise(res => setTimeout(res, ms));
 
+        body.push(sessionStorage.getItem("flightID"));
         for( var i = 0; i < selectedRow.length; i++)
             body.push(selectedRow[i]);
 
