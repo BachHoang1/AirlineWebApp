@@ -1,0 +1,27 @@
+Instructions for Running Our Web Application
+
+1. Install nodejs
+    a. Link: https://nodejs.org/en/download/
+    b. If installed correctly, you chould be able to open a command console and type and run "npm -v"(without quotes). This will return the version number.
+2. Install dependencies
+    a. open a command console and change your directory to where you saved our project
+    b. run the command "npm install"(without quotes), this should install our dependencies automatically
+3. open the password.txt and enter your UH linux server username and password with the format "username,password"(without quotes)
+4. login to your UH server account and run make_airline2.sql in the database. This is our schema
+    note: this will take 1-2 minutes to run. The file has a huge amount of insertions.
+5. Run our Web App
+    a. open a command console and change your directory to where you saved our project
+    b. run the command "node server.js"(without quotes). If there are no errors, the console should display "Server is running on http://localhost:8000"
+    c. open your prefered web browser and type in the URL "http://localhost:8000/AirlineWebApp"(without quotes)
+    d. this should show our web app
+
+The first page allows the user to search for a flight and manage tickets for a particlular flight.
+To start the booking process, search for a flight using any combination in the first box then click search button.
+This will bring you to the next page which will display one or two tables of flights. Select one row from either table, then click confirm
+The next page will show the price of the tickets and ask for the users information to pay. Enter phone Number with format(###-###-####) and credit card is 16 digits only
+Last page show display all of the tickets generated for the users flight plan then click back to home button. Remember the flight ID.
+On the home page there is a second box where airline personel can check tickets for a flight. Enter your flight ID that you used to book
+A table will display all the tickets that were generated. You can cancel a persons ticket by clicking the remove button.
+
+ER model diagram: https://drive.google.com/file/d/1LYHT0ulIUWVeqjqVmI7dBdOiOpaaIDN4/view
+Video Link: https://drive.google.com/file/d/1ZhikvJcrkIoPGubUMVzH63e96kGfF5mN/view
