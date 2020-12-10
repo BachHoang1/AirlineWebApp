@@ -80,6 +80,12 @@ server.post('/searchDirectResults', async(req, res)=>{
     catch(err){
         res.json(JSON.stringify(err.message));
     }
+
+    fs.writeFile('query.sql', query,  function(err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
   });
 
 server.post('/searchIndirectResults', async(req, res)=>{
@@ -126,6 +132,12 @@ server.post('/searchIndirectResults', async(req, res)=>{
     //}   else{
         
     //}
+
+    fs.writeFile('query.sql', query,  {'flag':'a'},  function(err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
   });
 
 server.post('/searchRoundTrip', async(req, res)=>{
@@ -166,6 +178,12 @@ server.post('/searchRoundTrip', async(req, res)=>{
     catch(err){
         res.json(JSON.stringify(err.message));
     }
+
+    fs.writeFile('query.sql', query,  function(err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
   });
 
 server.post('/UserFlight', async(req, res)=>{
@@ -223,6 +241,11 @@ if (body.length === 17){
             UPDATE boarding SET checked_bag = checked_bag + 1 WHERE boarding.flight_id = ${flight_id};
             COMMIT;`;
             await client.query(text);
+            fs.writeFile('transaction.sql', text + "\n",  {'flag':'a'},  function(err) {
+                if (err) {
+                    return console.error(err);
+                }
+            });
             query += "Transaction\n\n" + text + "\n\n";
             }
             catch(err)
@@ -242,6 +265,11 @@ if (body.length === 17){
                 INSERT INTO ticket_boarding_wait VALUES(${boarding_id},${ticket_no});
                 COMMIT;`;
                 await client.query(text);
+                fs.writeFile('transaction.sql', text + "\n",  {'flag':'a'},  function(err) {
+                    if (err) {
+                        return console.error(err);
+                    }
+                });
                 query += "Transaction\n\n" + text + "\n\n";
             }
             catch(err)
@@ -266,8 +294,13 @@ if (body.length === 17){
         WHERE tck.group_id = '${group_id}'
         ORDER BY tck.ticket_no;`;
         const result = await client.query(text);
+        fs.writeFile('query.sql', text + "\n",  {'flag':'a'},  function(err) {
+            if (err) {
+                return console.error(err);
+            }
+        });
         query += "\n\nDisplays All Tickets\n\n" + text;
-        res.json(result.rows); 
+        res.json(result.rows);
     }
 }
 else
@@ -330,6 +363,11 @@ else
             INSERT INTO ticket_boarding VALUES(${boarding_id},${ticket_no});
             COMMIT;`;
             await client.query(text);
+            fs.writeFile('transaction.sql', text + "\n",  {'flag':'a'},  function(err) {
+                if (err) {
+                    return console.error(err);
+                }
+            });
             query += "Transaction\n\n" + text + "\n\n";
             }
             catch(err)
@@ -357,6 +395,12 @@ else
         const result = await client.query(text);
         query += "\n\nDisplays All Tickets\n\n" + text;
         res.json(result.rows);
+
+        fs.writeFile('query.sql', text + "\n",  {'flag':'a'},  function(err) {
+            if (err) {
+                return console.error(err);
+            }
+        });
     }
 });
 
@@ -385,6 +429,12 @@ server.post('/ticketsForFlight', async(req, res)=>{
     catch(err){
         res.json(JSON.stringify(err.message));
     }
+
+    fs.writeFile('query.sql', query,  {'flag':'a'},  function(err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
   });
 
 server.post('/removeTicket', async(req, res)=>{
@@ -511,7 +561,7 @@ server.post('/removeTicket', async(req, res)=>{
         ALTER TABLE ticket_flights_wait ADD CONSTRAINT ticket_flights_wait_fare_conditions FOREIGN KEY (fare_conditions) REFERENCES fare_price(fare_conditions) ON DELETE CASCADE;
         ALTER TABLE ticket_boarding_wait ADD CONSTRAINT ticket_boarding_wait_ticket_no_fkey FOREIGN KEY (ticket_no) REFERENCES wait_list_info(ticket_no) ON DELETE CASCADE;
         ALTER TABLE ticket_boarding_wait ADD CONSTRAINT ticket_boarding_wait_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights_wait(boarding_id) ON DELETE CASCADE;
-        END;`;
+        COMMIT;`;
         const result = await client.query(query);
         client.end();
 
@@ -520,4 +570,10 @@ server.post('/removeTicket', async(req, res)=>{
     catch(err){
         res.json(JSON.stringify(err.message));
     }
+
+    fs.writeFile('transaction.sql', query ,  {'flag':'a'},  function(err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
   });
