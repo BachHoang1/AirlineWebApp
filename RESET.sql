@@ -127,16 +127,6 @@ CREATE TABLE ticket_boarding_wait(
     CONSTRAINT ticket_boarding_wait_boarding_id_fkey FOREIGN KEY (boarding_id) REFERENCES ticket_flights_wait(boarding_id)
 );
 
-CREATE TABLE boarding(
-	flight_id integer NOT NULL,
-	boarding_time timestamp WITH time zone NOT NULL,
-	boarding_gate char(2) NOT NULL,
-	checked_bag integer NOT NULL,
-	PRIMARY KEY (flight_id),
-    CONSTRAINT boarding_flight_id_fkey FOREIGN KEY (flight_id) REFERENCES flights(flight_id),
-    CONSTRAINT boarding_gate_id_fkey FOREIGN KEY (boarding_gate) REFERENCES gate(gate_id)
-);
-
 CREATE TABLE wait_list (
     ticket_no integer NOT NULL,
     flight_id integer NOT NULL,
@@ -2755,7 +2745,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1212,
+        1210,
         '2020-12-12 01:00:00+03',
         '2020-12-12 07:00:00+03',
         'LAX',
@@ -3991,7 +3981,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1313,
+        1310,
         '2020-12-13 01:00:00+03',
         '2020-12-13 07:00:00+03',
         'LAX',
@@ -5227,7 +5217,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1414,
+        1410,
         '2020-12-14 01:00:00+03',
         '2020-12-14 07:00:00+03',
         'LAX',
@@ -6463,7 +6453,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1515,
+        1510,
         '2020-12-15 01:00:00+03',
         '2020-12-15 07:00:00+03',
         'LAX',
@@ -7699,7 +7689,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1616,
+        1610,
         '2020-12-16 01:00:00+03',
         '2020-12-16 07:00:00+03',
         'LAX',
@@ -8935,7 +8925,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1717,
+        1710,
         '2020-12-17 01:00:00+03',
         '2020-12-17 07:00:00+03',
         'LAX',
@@ -10171,7 +10161,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1818,
+        1810,
         '2020-12-18 01:00:00+03',
         '2020-12-18 07:00:00+03',
         'LAX',
@@ -11406,7 +11396,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        1919,
+        1910,
         '2020-12-19 01:00:00+03',
         '2020-12-19 07:00:00+03',
         'LAX',
@@ -12642,7 +12632,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2020,
+        2010,
         '2020-12-20 01:00:00+03',
         '2020-12-20 07:00:00+03',
         'LAX',
@@ -13878,7 +13868,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2121,
+        2110,
         '2020-12-21 01:00:00+03',
         '2020-12-21 07:00:00+03',
         'LAX',
@@ -15114,7 +15104,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2222,
+        2210,
         '2020-12-22 01:00:00+03',
         '2020-12-22 07:00:00+03',
         'LAX',
@@ -16350,7 +16340,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2323,
+        2310,
         '2020-12-23 01:00:00+03',
         '2020-12-23 07:00:00+03',
         'LAX',
@@ -17586,7 +17576,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2424,
+        2410,
         '2020-12-24 01:00:00+03',
         '2020-12-24 07:00:00+03',
         'LAX',
@@ -18822,7 +18812,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2525,
+        2510,
         '2020-12-25 01:00:00+03',
         '2020-12-25 07:00:00+03',
         'LAX',
@@ -20058,7 +20048,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2626,
+        2610,
         '2020-12-26 01:00:00+03',
         '2020-12-26 07:00:00+03',
         'LAX',
@@ -21294,7 +21284,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2727,
+        2710,
         '2020-12-27 01:00:00+03',
         '2020-12-27 07:00:00+03',
         'LAX',
@@ -22530,7 +22520,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2828,
+        2810,
         '2020-12-28 01:00:00+03',
         '2020-12-28 07:00:00+03',
         'LAX',
@@ -23766,7 +23756,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        2929,
+        2910,
         '2020-12-29 01:00:00+03',
         '2020-12-29 07:00:00+03',
         'LAX',
@@ -25002,7 +24992,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3030,
+        3010,
         '2020-12-30 01:00:00+03',
         '2020-12-30 07:00:00+03',
         'LAX',
@@ -26238,7 +26228,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3131,
+        3110,
         '2020-12-31 01:00:00+03',
         '2020-12-31 07:00:00+03',
         'LAX',
@@ -27474,7 +27464,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3232,
+        3210,
         '2021-01-01 01:00:00+03',
         '2021-01-01 07:00:00+03',
         'LAX',
@@ -28710,7 +28700,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3333,
+        3310,
         '2021-01-02 01:00:00+03',
         '2021-01-02 07:00:00+03',
         'LAX',
@@ -29946,7 +29936,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3434,
+        3410,
         '2021-01-03 01:00:00+03',
         '2021-01-03 07:00:00+03',
         'LAX',
@@ -31182,7 +31172,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3535,
+        3510,
         '2021-01-04 01:00:00+03',
         '2021-01-04 07:00:00+03',
         'LAX',
@@ -32418,7 +32408,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3636,
+        3610,
         '2021-01-05 01:00:00+03',
         '2021-01-05 07:00:00+03',
         'LAX',
@@ -33654,7 +33644,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3737,
+        3710,
         '2021-01-06 01:00:00+03',
         '2021-01-06 07:00:00+03',
         'LAX',
@@ -34889,7 +34879,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3838,
+        3810,
         '2021-01-07 01:00:00+03',
         '2021-01-07 07:00:00+03',
         'LAX',
@@ -36125,7 +36115,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        3939,
+        3910,
         '2021-01-08 01:00:00+03',
         '2021-01-08 07:00:00+03',
         'LAX',
@@ -37361,7 +37351,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4040,
+        4010,
         '2021-01-09 01:00:00+03',
         '2021-01-09 07:00:00+03',
         'LAX',
@@ -38597,7 +38587,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4141,
+        4110,
         '2021-01-10 01:00:00+03',
         '2021-01-10 07:00:00+03',
         'LAX',
@@ -39833,7 +39823,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4242,
+        4210,
         '2021-01-11 01:00:00+03',
         '2021-01-11 07:00:00+03',
         'LAX',
@@ -41069,7 +41059,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4343,
+        4310,
         '2021-01-12 01:00:00+03',
         '2021-01-12 07:00:00+03',
         'LAX',
@@ -42305,7 +42295,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4444,
+        4410,
         '2021-01-13 01:00:00+03',
         '2021-01-13 07:00:00+03',
         'LAX',
@@ -43541,7 +43531,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4545,
+        4510,
         '2021-01-14 01:00:00+03',
         '2021-01-14 07:00:00+03',
         'LAX',
@@ -44777,7 +44767,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4646,
+        4610,
         '2021-01-15 01:00:00+03',
         '2021-01-15 07:00:00+03',
         'LAX',
@@ -46013,7 +46003,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4747,
+        4710,
         '2021-01-16 01:00:00+03',
         '2021-01-16 07:00:00+03',
         'LAX',
@@ -47249,7 +47239,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4848,
+        4810,
         '2021-01-17 01:00:00+03',
         '2021-01-17 07:00:00+03',
         'LAX',
@@ -48485,7 +48475,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        4949,
+        4910,
         '2021-01-18 01:00:00+03',
         '2021-01-18 07:00:00+03',
         'LAX',
@@ -49721,7 +49711,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5050,
+        5010,
         '2021-01-19 01:00:00+03',
         '2021-01-19 07:00:00+03',
         'LAX',
@@ -50957,7 +50947,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5151,
+        5110,
         '2021-01-20 01:00:00+03',
         '2021-01-20 07:00:00+03',
         'LAX',
@@ -52193,7 +52183,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5252,
+        5210,
         '2021-01-21 01:00:00+03',
         '2021-01-21 07:00:00+03',
         'LAX',
@@ -53429,7 +53419,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5353,
+        5310,
         '2021-01-22 01:00:00+03',
         '2021-01-22 07:00:00+03',
         'LAX',
@@ -54665,7 +54655,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5454,
+        5410,
         '2021-01-23 01:00:00+03',
         '2021-01-23 07:00:00+03',
         'LAX',
@@ -55901,7 +55891,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5555,
+        5510,
         '2021-01-24 01:00:00+03',
         '2021-01-24 07:00:00+03',
         'LAX',
@@ -57137,7 +57127,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5656,
+        5610,
         '2021-01-25 01:00:00+03',
         '2021-01-25 07:00:00+03',
         'LAX',
@@ -58373,7 +58363,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5757,
+        5710,
         '2021-01-26 01:00:00+03',
         '2021-01-26 07:00:00+03',
         'LAX',
@@ -59609,7 +59599,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5858,
+        5810,
         '2021-01-27 01:00:00+03',
         '2021-01-27 07:00:00+03',
         'LAX',
@@ -60845,7 +60835,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        5959,
+        5910,
         '2021-01-28 01:00:00+03',
         '2021-01-28 07:00:00+03',
         'LAX',
@@ -62081,7 +62071,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6060,
+        6010,
         '2021-01-29 01:00:00+03',
         '2021-01-29 07:00:00+03',
         'LAX',
@@ -63317,7 +63307,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6161,
+        6110,
         '2021-01-30 01:00:00+03',
         '2021-01-30 07:00:00+03',
         'LAX',
@@ -64553,7 +64543,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6262,
+        6210,
         '2021-01-31 01:00:00+03',
         '2021-01-31 07:00:00+03',
         'LAX',
@@ -65789,7 +65779,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6363,
+        6310,
         '2021-02-01 01:00:00+03',
         '2021-02-01 07:00:00+03',
         'LAX',
@@ -67025,7 +67015,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6464,
+        6410,
         '2021-02-02 01:00:00+03',
         '2021-02-02 07:00:00+03',
         'LAX',
@@ -68261,7 +68251,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6565,
+        6510,
         '2021-02-03 01:00:00+03',
         '2021-02-03 07:00:00+03',
         'LAX',
@@ -69497,7 +69487,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6666,
+        6610,
         '2021-02-04 01:00:00+03',
         '2021-02-04 07:00:00+03',
         'LAX',
@@ -70733,7 +70723,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6767,
+        6710,
         '2021-02-05 01:00:00+03',
         '2021-02-05 07:00:00+03',
         'LAX',
@@ -71969,7 +71959,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6868,
+        6810,
         '2021-02-06 01:00:00+03',
         '2021-02-06 07:00:00+03',
         'LAX',
@@ -73205,7 +73195,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        6969,
+        6910,
         '2021-02-07 01:00:00+03',
         '2021-02-07 07:00:00+03',
         'LAX',
@@ -74441,7 +74431,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        7070,
+        7010,
         '2021-02-08 01:00:00+03',
         '2021-02-08 07:00:00+03',
         'LAX',
@@ -75677,7 +75667,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        7171,
+        7110,
         '2021-02-09 01:00:00+03',
         '2021-02-09 07:00:00+03',
         'LAX',
@@ -76913,7 +76903,7 @@ VALUES (
 
 INSERT INTO flights
 VALUES (
-        7272,
+        7210,
         '2021-02-10 01:00:00+03',
         '2021-02-10 07:00:00+03',
         'LAX',
