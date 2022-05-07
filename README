@@ -1,3 +1,5 @@
+ER model diagram: https://drive.google.com/file/d/1LYHT0ulIUWVeqjqVmI7dBdOiOpaaIDN4/view
+Video Link: https://drive.google.com/file/d/1ZhikvJcrkIoPGubUMVzH63e96kGfF5mN/view
 Instructions for Running Our Web Application
 
 1. Install nodejs
@@ -26,6 +28,3 @@ A table will display all the tickets that were generated. You can cancel a perso
 
 If you stop the server and run it again, you will need to run the RESET.sql file first in order to reset our schema every time.
 Run this in the same way as make_airline.sql.
-
-ER model diagram: https://drive.google.com/file/d/1LYHT0ulIUWVeqjqVmI7dBdOiOpaaIDN4/view
-Video Link: https://drive.google.com/file/d/1ZhikvJcrkIoPGubUMVzH63e96kGfF5mN/view
